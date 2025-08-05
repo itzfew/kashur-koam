@@ -5,6 +5,6 @@
     "type": "village",
     "district": "Central District",
     "village": "Sample Village",
-    "content": "This is a detailed description about Sample Village in Central District. It contains information about the population, facilities, and other important details about the village. The village is known for its agricultural production and has a population of approximately 5,000 people.",
+    "content": "This is a detailed description about Sample Village in Central District. It contains information about the population, facilities, and other important details about the village.",
     "tags": ["village", "central", "population"]
 }
