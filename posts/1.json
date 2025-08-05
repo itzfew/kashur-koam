@@ -1,0 +1,9 @@
+{
+  "title": "Sample Village Post",
+  "date": "2025-05-08",
+  "author": "John Doe",
+  "type": "village",
+  "district": "Central District",
+  "content": "This is a detailed description about the village...",
+  "tags": ["village", "central"]
+}
