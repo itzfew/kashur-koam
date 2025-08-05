@@ -1,0 +1,20 @@
+title: EduHub
+description: Comprehensive educational resources including school information, village data, and educational posts.
+url: "https://your-username.github.io" # Replace with your GitHub Pages URL
+baseurl: "" # Leave empty if using user/organization GitHub Pages
+timezone: UTC
+
+# Build settings
+theme: jekyll-theme-minimal
+plugins:
+  - jekyll-feed
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
