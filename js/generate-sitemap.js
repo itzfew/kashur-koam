@@ -4,7 +4,7 @@ const path = require('path');
 async function generateSitemap() {
     const postsDir = path.join(__dirname, 'posts');
     const sitemapPath = path.join(__dirname, 'sitemap.xml');
-    const baseUrl = 'https://yourusername.github.io'; // Replace with your GitHub Pages URL
+    const baseUrl = 'https://kashur-koam.pages.dev'; // Replace with your GitHub Pages URL
 
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
