@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Author - EduHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">EduHub</a></h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../privacy-policy.html">Privacy Policy</a>
+            <a href="../terms-and-conditions.html">Terms</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="author-info">
+            <h2 id="author-name">Author</h2>
+            <div class="posts-container" id="author-posts"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 EduHub. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const authorName = urlParams.get('name');
+            
+            if (!authorName) {
+                document.getElementById('author-name').textContent = 'Author Not Specified';
+                document.getElementById('author-posts').innerHTML = '<p>No author specified.</p>';
+                return;
+            }
+
+            document.getElementById('author-name').textContent = `Posts by ${decodeURIComponent(authorName)}`;
+
+            fetchAllPosts()
+                .then(posts => {
+                    const authorPosts = posts.filter(post => post.author === decodeURIComponent(authorName));
+                    
+                    const authorPostsContainer = document.getElementById('author-posts');
+                    authorPostsContainer.innerHTML = authorPosts.length ? 
+                        authorPosts.map(post => createPostCard(post)).join('') :
+                        '<p>No posts found for this author.</p>';
+                });
+        });
+    </script>
+</body>
+</html>
