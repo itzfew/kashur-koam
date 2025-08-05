@@ -1,31 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduHub - Educational Resources</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <title>Static Post Loader</title>
+  <style>
+    .post { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
+  </style>
 </head>
 <body>
-    <header>...</header>
-    <main>
-        <section id="recent-posts">
-            <h2>Recent Posts</h2>
-            <div class="posts-container" id="recent-posts-container">
-                <!-- Posts load here via JavaScript -->
-                <p>Loading posts...</p>
-            </div>
-        </section>
-
-        <section id="featured-posts">
-            <h2>Featured Posts</h2>
-            <div class="posts-container" id="featured-posts-container">
-                <!-- Posts load here via JavaScript -->
-                <p>Loading posts...</p>
-            </div>
-        </section>
-    </main>
-    <script src="js/main.js"></script>
+  <h1>Latest Posts</h1>
+  <div id="posts-container"></div>
+  <script src="js/load-posts.js"></script>
 </body>
 </html>
