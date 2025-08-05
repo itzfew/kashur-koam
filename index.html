@@ -1,180 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home - EduHub</title>
-  <meta name="description" content="EduHub: Explore recent posts, districts, villages, and schools.">
-  <meta name="keywords" content="education, districts, villages, schools, blog">
-  <meta name="author" content="EduHub Team">
-  <meta property="og:title" content="EduHub Home">
-  <meta property="og:description" content="Explore educational content, districts, and schools.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://username.github.io/">
-  <meta name="twitter:card" content="summary_large_image">
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      color: #000;
-      background: #fff;
-      line-height: 1.6;
-    }
-    a {
-      color: #000;
-      text-decoration: underline;
-    }
-    a:hover {
-      text-decoration: none;
-    }
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    header {
-      text-align: center;
-      padding: 20px 0;
-    }
-    nav {
-      margin-bottom: 20px;
-    }
-    nav a {
-      margin: 0 10px;
-      text-decoration: none;
-    }
-    .section {
-      margin-bottom: 40px;
-    }
-    .section h2 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    .post-grid, .district-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .post, .district, .school {
-      padding: 10px;
-      background: #fff;
-    }
-    .post h3, .district h3, .school h3 {
-      margin: 0 0 10px;
-      font-size: 18px;
-    }
-    .post p, .district p, .school p {
-      margin: 0 0 10px;
-    }
-    .post-meta {
-      font-size: 14px;
-      color: #555;
-    }
-    .post-meta i {
-      margin-right: 5px;
-    }
-    footer {
-      text-align: center;
-      padding: 20px 0;
-      background: #000;
-      color: #fff;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Educational hub with posts, districts, and schools information">
+    <meta name="keywords" content="education, districts, schools, villages, posts">
+    <meta name="author" content="EduHub">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="EduHub - Posts, Districts, and Schools">
+    <meta property="og:description" content="Explore educational posts, districts, and schools information.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://username.github.io">
+    <meta property="og:image" content="https://username.github.io/images/logo.png">
+    <title>EduHub - Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="js/main.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #000;
+            background: #fff;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            text-align: center;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .post-grid, .district-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .post, .district, .school {
+            padding: 15px;
+            border: 1px solid #000;
+        }
+        .post h3, .district h3, .school h3 {
+            margin: 0 0 10px;
+        }
+        .post-preview {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .author {
+            display: flex;
+            align-items: center;
+        }
+        .author i {
+            margin-right: 5px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        footer a {
+            color: #fff;
+            margin: 0 10px;
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>EduHub</h1>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms & Conditions</a>
-      <a href="/contact.html">Contact</a>
-    </nav>
-  </header>
-  <div class="container">
-    <div class="section" id="recent-posts">
-      <h2>Recent Posts</h2>
-      <div class="post-grid" id="recent-posts-grid"></div>
+    <header>
+        <h1>EduHub</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="_pages/privacy.html">Privacy Policy</a>
+            <a href="_pages/contact.html">Contact</a>
+            <a href="_pages/terms.html">Terms and Conditions</a>
+        </nav>
+    </header>
+    <div class="container">
+        <section>
+            <h2>Recent Posts</h2>
+            <div class="post-grid" id="recent-posts"></div>
+        </section>
+        <section>
+            <h2>Most Detailed Posts</h2>
+            <div class="post-grid" id="longest-posts"></div>
+        </section>
+        <section>
+            <h2>Districts</h2>
+            <div class="district-grid" id="districts"></div>
+        </section>
+        <section>
+            <h2>Schools by District</h2>
+            <div id="schools"></div>
+        </section>
     </div>
-    <div class="section" id="longest-posts">
-      <h2>Most Detailed Posts</h2>
-      <div class="post-grid" id="longest-posts-grid"></div>
-    </div>
-    <div class="section" id="districts">
-      <h2>Districts</h2>
-      <div class="district-grid" id="districts-grid"></div>
-    </div>
-    <div class="section" id="schools">
-      <h2>Schools by District</h2>
-      <div class="post-grid" id="schools-grid"></div>
-    </div>
-  </div>
-  <footer>
-    <p>&copy; 2025 EduHub. All rights reserved.</p>
-  </footer>
-  <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-  <script>
-    // Sample data (replace with fetch from _posts/)
-    const posts = [
-      { title: "Post 1", date: "2025-08-01", type: "general", author: "John Doe", content: "This is a general post about education...".repeat(10) },
-      { title: "Village A", date: "2025-07-30", type: "village", author: "Jane Smith", content: "Details about Village A...".repeat(20), district: "District 1" },
-      { title: "School X", date: "2025-07-25", type: "school", author: "John Doe", content: "Details about School X...".repeat(15), district: "District 1" },
-      { title: "Post 2", date: "2025-07-20", type: "general", author: "Jane Smith", content: "Another post...".repeat(5) },
-      { title: "Village B", date: "2025-07-15", type: "village", author: "John Doe", content: "Details about Village B...".repeat(25), district: "District 2" },
-      { title: "School Y", date: "2025-07-10", type: "school", author: "Jane Smith", content: "Details about School Y...".repeat(12), district: "District 2" },
-    ];
-
-    // Load recent posts (4)
-    const recentPosts = posts.slice(0, 4);
-    const recentGrid = document.getElementById('recent-posts-grid');
-    recentPosts.forEach(post => {
-      const div = document.createElement('div');
-      div.className = 'post';
-      div.innerHTML = `
-        <h3><a href="/post.html?title=${encodeURIComponent(post.title)}">${post.title}</a></h3>
-        <p>${post.content.substring(0, 100)}...</p>
-        <div class="post-meta">
-          <i class="fa fa-user"></i><a href="/author.html?name=${encodeURIComponent(post.author)}">${post.author}</a> | ${post.date}
-        </div>
-      `;
-      recentGrid.appendChild(div);
-    });
-
-    // Load longest posts (3)
-    const longestPosts = posts.sort((a, b) => b.content.length - a.content.length).slice(0, 3);
-    const longestGrid = document.getElementById('longest-posts-grid');
-    longestPosts.forEach(post => {
-      const div = document.createElement('div');
-      div.className = 'post';
-      div.innerHTML = `
-        <h3><a href="/post.html?title=${encodeURIComponent(post.title)}">${post.title}</a></h3>
-        <p>${post.content.substring(0, 100)}...</p>
-        <div class="post-meta">
-          <i class="fa fa-user"></i><a href="/author.html?name=${encodeURIComponent(post.author)}">${post.author}</a> | ${post.date}
-        </div>
-      `;
-      longestGrid.appendChild(div);
-    });
-
-    // Load districts
-    const districts = [...new Set(posts.filter(p => p.type === 'village' || p.type === 'school').map(p => p.district))];
-    const districtsGrid = document.getElementById('districts-grid');
-    districts.forEach(district => {
-      const div = document.createElement('div');
-      div.className = 'district';
-      div.innerHTML = `<h3><a href="/district.html?label=${encodeURIComponent(district)}">${district}</a></h3>`;
-      districtsGrid.appendChild(div);
-    });
-
-    // Load schools by district
-    const schoolsGrid = document.getElementById('schools-grid');
-    districts.forEach(district => {
-      const div = document.createElement('div');
-      div.className = 'school';
-      div.innerHTML = `<h3><a href="/school.html?label=school_${encodeURIComponent(district)}">${district} Schools</a></h3>`;
-      schoolsGrid.appendChild(div);
-    });
-  </script>
+    <footer>
+        <p>&copy; 2025 EduHub. All rights reserved.</p>
+        <a href="_pages/privacy.html">Privacy Policy</a>
+        <a href="_pages/contact.html">Contact</a>
+        <a href="_pages/terms.html">Terms and Conditions</a>
+    </footer>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "EduHub",
+        "url": "https://username.github.io",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://username.github.io/search.html?label={search_term}",
+            "query-input": "required name=search_term"
+        }
+    }
+    </script>
 </body>
 </html>
