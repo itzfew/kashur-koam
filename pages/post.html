@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Read detailed educational posts on EduHub.">
+    <meta name="keywords" content="education, posts, EduHub">
     <title>Post - EduHub</title>
-    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -12,17 +14,14 @@
         <h1><a href="/">EduHub</a></h1>
         <nav>
             <a href="/">Home</a>
-            <a href="../contact.html">Contact</a>
-            <a href="../privacy-policy.html">Privacy Policy</a>
-            <a href="../terms-and-conditions.html">Terms</a>
+            <a href="/pages/contact.html">Contact</a>
+            <a href="/pages/privacy-policy.html">Privacy Policy</a>
+            <a href="/pages/terms-and-conditions.html">Terms</a>
         </nav>
     </header>
 
     <main>
-        <article id="post-content">
-            <!-- Post content will be loaded here by JavaScript -->
-        </article>
-
+        <article id="post-content"></article>
         <section id="recommended-posts">
             <h2>Recommended Posts</h2>
             <div class="posts-container" id="recommended-container"></div>
@@ -33,86 +32,75 @@
         <p>&copy; 2025 EduHub. All rights reserved.</p>
     </footer>
 
-    <script src="../js/main.js"></script>
+    <script src="/js/main.js"></script>
     <script>
-        // Load the specific post based on URL parameter
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const postTitle = urlParams.get('title');
-            
+
             if (!postTitle) {
                 document.getElementById('post-content').innerHTML = '<p>Post not found.</p>';
                 return;
             }
 
-            fetchAllPosts()
-                .then(posts => {
-                    const post = posts.find(p => p.title === decodeURIComponent(postTitle));
-                    if (!post) {
-                        document.getElementById('post-content').innerHTML = '<p>Post not found.</p>';
-                        return;
-                    }
+            const posts = await fetchAllPosts();
+            const post = posts.find(p => p.title === decodeURIComponent(postTitle));
 
-                    displayPost(post);
-                    displayRecommendedPosts(posts, post);
-                });
-        });
+            if (!post) {
+                document.getElementById('post-content').innerHTML = '<p>Post not found.</p>';
+                return;
+            }
 
-        function displayPost(post) {
-            const postContent = document.getElementById('post-content');
-            const date = new Date(post.date).toLocaleDateString();
-            
-            postContent.innerHTML = `
-                <h2>${post.title}</h2>
-                <div class="post-meta">
-                    <span>${date}</span> | 
-                    <a href="../pages/author.html?name=${encodeURIComponent(post.author)}" class="author-link">
-                        <i class="fas fa-user"></i> ${post.author}
-                    </a>
-                    ${post.district ? `| <span>${post.district}</span>` : ''}
-                    ${post.village ? `| <span>${post.village}</span>` : ''}
-                </div>
-                <div class="post-body">
-                    ${post.content}
-                </div>
-                ${post.tags && post.tags.length ? `
-                    <div class="post-tags">
-                        Tags: ${post.tags.map(tag => `<span>${tag}</span>`).join(', ')}
+            displayPost(post);
+            displayRecommendedPosts(posts, post);
+
+            function displayPost(post) {
+                const postContent = document.getElementById('post-content');
+                const date = new Date(post.date).toLocaleDateString();
+
+                postContent.innerHTML = `
+                    <h2>${post.title}</h2>
+                    <div class="post-meta">
+                        <span>${date}</span> | 
+                        <a href="/pages/author.html?name=${encodeURIComponent(post.author)}" class="author-link">
+                            <i class="fas fa-user"></i> ${post.author}
+                        </a>
+                        ${post.district ? `| <span>${post.district}</span>` : ''}
+                        ${post.village ? `| <span>${post.village}</span>` : ''}
                     </div>
-                ` : ''}
-            `;
-        }
+                    <div class="post-body">
+                        ${post.content}
+                    </div>
+                    ${post.tags && post.tags.length ? `
+                        <div class="post-tags">
+                            Tags: ${post.tags.map(tag => `<span>${tag}</span>`).join(', ')}
+                        </div>
+                    ` : ''}
+                `;
+            }
 
-        function displayRecommendedPosts(allPosts, currentPost) {
-            const recommendedContainer = document.getElementById('recommended-container');
-            if (!recommendedContainer) return;
+            function displayRecommendedPosts(allPosts, currentPost) {
+                const recommendedContainer = document.getElementById('recommended-container');
+                const recommendedPosts = allPosts
+                    .filter(post => post.title !== currentPost.title)
+                    .sort((a, b) => {
+                        if (a.type === currentPost.type && b.type !== currentPost.type) return -1;
+                        if (a.type !== currentPost.type && b.type === currentPost.type) return 1;
+                        if (a.district === currentPost.district && b.district !== currentPost.district) return -1;
+                        if (a.district !== currentPost.district && b.district === currentPost.district) return 1;
+                        const aTagMatches = currentPost.tags ? 
+                            a.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
+                        const bTagMatches = currentPost.tags ? 
+                            b.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
+                        return bTagMatches - aTagMatches;
+                    })
+                    .slice(0, 3);
 
-            // Get posts with similar tags or same type/district
-            const recommendedPosts = allPosts
-                .filter(post => post.title !== currentPost.title)
-                .sort((a, b) => {
-                    // Prioritize same type
-                    if (a.type === currentPost.type && b.type !== currentPost.type) return -1;
-                    if (a.type !== currentPost.type && b.type === currentPost.type) return 1;
-                    
-                    // Then same district
-                    if (a.district === currentPost.district && b.district !== currentPost.district) return -1;
-                    if (a.district !== currentPost.district && b.district === currentPost.district) return 1;
-                    
-                    // Then shared tags
-                    const aTagMatches = currentPost.tags ? 
-                        a.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
-                    const bTagMatches = currentPost.tags ? 
-                        b.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
-                    
-                    return bTagMatches - aTagMatches;
-                })
-                .slice(0, 3);
-
-            recommendedContainer.innerHTML = recommendedPosts.length ? 
-                recommendedPosts.map(post => createPostCard(post)).join('') :
-                '<p>No recommended posts found.</p>';
-        }
+                recommendedContainer.innerHTML = recommendedPosts.length ?
+                    recommendedPosts.map(post => createPostCard(post)).join('') :
+                    '<p>No recommended posts found.</p>';
+            }
+        });
     </script>
 </body>
 </html>
