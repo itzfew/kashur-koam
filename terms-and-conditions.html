@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions - EduHub</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>EduHub</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="privacy-policy.html">Privacy Policy</a>
+            <a href="terms-and-conditions.html">Terms</a>
+            <a href="contact.html">Contact</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Terms and Conditions</h2>
+        <p>Last updated: <span id="current-date"></span></p>
+        
+        <h3>1. Acceptance of Terms</h3>
+        <p>By accessing and using this website, you accept and agree to be bound by these Terms and Conditions.</p>
+        
+        <h3>2. Use License</h3>
+        <p>Permission is granted to temporarily download one copy of the materials on EduHub's website for personal, non-commercial transitory viewing only.</p>
+        
+        <h3>3. Disclaimer</h3>
+        <p>The materials on EduHub's website are provided on an 'as is' basis. EduHub makes no warranties, expressed or implied.</p>
+        
+        <h3>4. Limitations</h3>
+        <p>In no event shall EduHub or its suppliers be liable for any damages arising out of the use or inability to use the materials on EduHub's website.</p>
+        
+        <h3>5. Accuracy of Materials</h3>
+        <p>The materials appearing on EduHub's website could include technical, typographical, or photographic errors.</p>
+        
+        <h3>6. Modifications</h3>
+        <p>EduHub may revise these terms of service for its website at any time without notice.</p>
+        
+        <h3>7. Governing Law</h3>
+        <p>These terms and conditions are governed by and construed in accordance with the laws of the website owner's jurisdiction.</p>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> EduHub. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('year').textContent = new Date().getFullYear();
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString();
+    </script>
+</body>
+</html>
