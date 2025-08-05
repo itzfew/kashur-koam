@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - EduHub</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">EduHub</a></h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="../contact.html">Contact</a>
+            <a href="../privacy-policy.html">Privacy Policy</a>
+            <a href="../terms-and-conditions.html">Terms</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="search-results">
+            <h2>Search Results</h2>
+            <div class="posts-container" id="results-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 EduHub. All rights reserved.</p>
+    </footer>
+
+    <script src="../js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const label = urlParams.get('label');
+            
+            if (!label) {
+                document.getElementById('results-container').innerHTML = '<p>No search parameter provided.</p>';
+                return;
+            }
+
+            // Update title based on search type
+            document.querySelector('h2').textContent = label.startsWith('school_') ? 
+                `Schools in ${label.replace('school_', '')}` : 
+                `Villages in ${label}`;
+
+            fetchAllPosts()
+                .then(posts => {
+                    let filteredPosts;
+                    
+                    if (label.startsWith('school_')) {
+                        const district = label.replace('school_', '');
+                        filteredPosts = posts.filter(post => 
+                            post.type === 'school' && post.district === district
+                        );
+                    } else {
+                        filteredPosts = posts.filter(post => 
+                            post.type === 'village' && post.district === label
+                        );
+                    }
+
+                    const resultsContainer = document.getElementById('results-container');
+                    resultsContainer.innerHTML = filteredPosts.length ? 
+                        filteredPosts.map(post => createPostCard(post)).join('') :
+                        '<p>No results found.</p>';
+                });
+        });
+    </script>
+</body>
+</html>
