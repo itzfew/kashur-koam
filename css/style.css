@@ -65,6 +65,29 @@ h2 {
 .post-card:hover {
     transform: translateY(-5px);
 }
+/* Add this to your existing style.css */
+.post-card .post-type {
+    display: inline-block;
+    padding: 2px 8px;
+    background-color: #f0f0f0;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    margin-right: 8px;
+    color: #555;
+}
+
+/* Add to your :root */
+:root {
+    --type-village: #4CAF50;
+    --type-school: #2196F3;
+    --type-district: #9C27B0;
+    --type-general: #FF9800;
+}
+
+.post-type.village { background-color: var(--type-village); color: white; }
+.post-type.school { background-color: var(--type-school); color: white; }
+.post-type.district { background-color: var(--type-district); color: white; }
+.post-type.general { background-color: var(--type-general); color: white; }
 
 .post-title {
     font-size: 1.2rem;
