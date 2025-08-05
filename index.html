@@ -1,15 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Static Post Loader</title>
-  <style>
-    .post { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="EduHub - Explore educational posts, districts, villages, and schools. Find the latest and most detailed content about education.">
+    <meta name="keywords" content="education, schools, villages, districts, learning, EduHub">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="EduHub Team">
+    <title>EduHub - Educational Resources</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 </head>
 <body>
-  <h1>Latest Posts</h1>
-  <div id="posts-container"></div>
-  <script src="js/load-posts.js"></script>
+    <header>
+        <h1><a href="/">EduHub</a></h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/pages/contact.html">Contact</a>
+            <a href="/pages/privacy-policy.html">Privacy Policy</a>
+            <a href="/pages/terms-and-conditions.html">Terms</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="recent-posts">
+            <h2>Recent Posts</h2>
+            <div class="posts-container" id="recent-posts-container"></div>
+        </section>
+
+        <section id="lengthy-posts">
+            <h2>Most Detailed Posts</h2>
+            <div class="posts-container" id="lengthy-posts-container"></div>
+        </section>
+
+        <section id="districts">
+            <h2>Available Districts</h2>
+            <div class="districts-grid" id="districts-container"></div>
+        </section>
+
+        <section id="schools">
+            <h2>Schools by District</h2>
+            <div class="schools-list" id="schools-container"></div>
+        </section>
+
+        <section id="recommended-posts">
+            <h2>Recommended Posts</h2>
+            <div class="posts-container" id="recommended-container"></div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 EduHub. All rights reserved.</p>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const posts = await fetchAllPosts();
+
+            // Display Recent Posts (4 most recent)
+            const recentPosts = posts.slice(0, 4);
+            document.getElementById('recent-posts-container').innerHTML = recentPosts.length ?
+                recentPosts.map(post => createPostCard(post)).join('') :
+                '<p>No recent posts found.</p>';
+
+            // Display Most Lengthy Posts (3 longest by content length)
+            const lengthyPosts = posts
+                .sort((a, b) => b.content.length - a.content.length)
+                .slice(0, 3);
+            document.getElementById('lengthy-posts-container').innerHTML = lengthyPosts.length ?
+                lengthyPosts.map(post => createPostCard(post)).join('') :
+                '<p>No detailed posts found.</p>';
+
+            // Display Districts Grid
+            const districts = [...new Set(posts
+                .filter(post => post.district)
+                .map(post => post.district))];
+            document.getElementById('districts-container').innerHTML = districts.length ?
+                districts.map(district => `
+                    <a href="/pages/search.html?label=${encodeURIComponent(district)}" class="district-card">
+                        ${district}
+                    </a>
+                `).join('') :
+                '<p>No districts found.</p>';
+
+            // Display Schools by District
+            const schoolsByDistrict = {};
+            posts.filter(post => post.type === 'school').forEach(post => {
+                if (!schoolsByDistrict[post.district]) {
+                    schoolsByDistrict[post.district] = [];
+                }
+                schoolsByDistrict[post.district].push(post);
+            });
+
+            document.getElementById('schools-container').innerHTML = Object.keys(schoolsByDistrict).length ?
+                Object.keys(schoolsByDistrict).map(district => `
+                    <div class="district-schools">
+                        <h3><a href="/pages/search.html?label=school_${encodeURIComponent(district)}">${district}</a></h3>
+                        <div class="posts-container">
+                            ${schoolsByDistrict[district].map(post => createPostCard(post)).join('')}
+                        </div>
+                    </div>
+                `).join('') :
+                '<p>No schools found.</p>';
+
+            // Display Recommended Posts (random 3 posts)
+            const recommendedPosts = posts
+                .sort(() => Math.random() - 0.5)
+                .slice(0, 3);
+            document.getElementById('recommended-container').innerHTML = recommendedPosts.length ?
+                recommendedPosts.map(post => createPostCard(post)).join('') :
+                '<p>No recommended posts found.</p>';
+        });
+    </script>
 </body>
 </html>
