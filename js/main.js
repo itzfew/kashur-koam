@@ -14,11 +14,18 @@ async function fetchAllPosts() {
             break;
         }
     }
+
+    // Sort posts by date in descending order (most recent first)
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
     return posts;
 }
 
 function createPostCard(post) {
-    const date = new Date(post.date).toLocaleDateString();
+    const date = new Date(post.date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
     const previewContent = post.content.length > 100 ? 
         post.content.slice(0, 100) + '...' : 
         post.content;
