@@ -11,19 +11,21 @@
 </head>
 <body>
     <header>
-        <h1><a href="/">EduHub</a></h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/pages/contact.html">Contact</a>
-            <a href="/pages/privacy-policy.html">Privacy Policy</a>
-            <a href="/pages/terms-and-conditions.html">Terms</a>
-        </nav>
+        <div class="header-container">
+            <h1><a href="/">EduHub</a></h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/pages/contact.html">Contact</a>
+                <a href="/pages/privacy-policy.html">Privacy Policy</a>
+                <a href="/pages/terms-and-conditions.html">Terms</a>
+            </nav>
+        </div>
     </header>
 
     <main>
-        <article id="post-content"></article>
+        <article id="post-content" class="post-article"></article>
         <section id="recommended-posts">
-            <h2>Recommended Posts</h2>
+            <h2>Recommended for You</h2>
             <div class="posts-container" id="recommended-container"></div>
         </section>
     </main>
@@ -56,18 +58,24 @@
 
             function displayPost(post) {
                 const postContent = document.getElementById('post-content');
-                const date = new Date(post.date).toLocaleDateString();
+                const date = new Date(post.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
 
                 postContent.innerHTML = `
-                    <h2>${post.title}</h2>
-                    <div class="post-meta">
-                        <span>${date}</span> | 
-                        <a href="/pages/author.html?name=${encodeURIComponent(post.author)}" class="author-link">
-                            <i class="fas fa-user"></i> ${post.author}
-                        </a>
-                        ${post.district ? `| <span>${post.district}</span>` : ''}
-                        ${post.village ? `| <span>${post.village}</span>` : ''}
-                    </div>
+                    <header class="post-header">
+                        <h2>${post.title}</h2>
+                        <div class="post-meta">
+                            <span>${date}</span> | 
+                            <a href="/pages/author.html?name=${encodeURIComponent(post.author)}" class="author-link">
+                                <i class="fas fa-user"></i> ${post.author}
+                            </a>
+                            ${post.district ? `| <span>${post.district}</span>` : ''}
+                            ${post.village ? `| <span>${post.village}</span>` : ''}
+                        </div>
+                    </header>
                     <div class="post-body">
                         ${post.content}
                     </div>
@@ -84,15 +92,11 @@
                 const recommendedPosts = allPosts
                     .filter(post => post.title !== currentPost.title)
                     .sort((a, b) => {
-                        if (a.type === currentPost.type && b.type !== currentPost.type) return -1;
-                        if (a.type !== currentPost.type && b.type === currentPost.type) return 1;
-                        if (a.district === currentPost.district && b.district !== currentPost.district) return -1;
-                        if (a.district !== currentPost.district && b.district === currentPost.district) return 1;
                         const aTagMatches = currentPost.tags ? 
                             a.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
                         const bTagMatches = currentPost.tags ? 
                             b.tags.filter(tag => currentPost.tags.includes(tag)).length : 0;
-                        return bTagMatches - aTagMatches;
+                        return bTagMatches - aTagMatches || new Date(b.date) - new Date(a.date);
                     })
                     .slice(0, 3);
 
