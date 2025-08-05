@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EduHub - Explore educational posts, districts, villages, and schools. Find the latest and most detailed content about education.">
+    <meta name="description" content="EduHub - Discover educational posts, districts, villages, and schools. Explore the latest and most detailed content about education.">
     <meta name="keywords" content="education, schools, villages, districts, learning, EduHub">
     <meta name="robots" content="index, follow">
     <meta name="author" content="EduHub Team">
@@ -14,16 +14,23 @@
 </head>
 <body>
     <header>
-        <h1><a href="/">EduHub</a></h1>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/pages/contact.html">Contact</a>
-            <a href="/pages/privacy-policy.html">Privacy Policy</a>
-            <a href="/pages/terms-and-conditions.html">Terms</a>
-        </nav>
+        <div class="header-container">
+            <h1><a href="/">EduHub</a></h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/pages/contact.html">Contact</a>
+                <a href="/pages/privacy-policy.html">Privacy Policy</a>
+                <a href="/pages/terms-and-conditions.html">Terms</a>
+            </nav>
+        </div>
     </header>
 
     <main>
+        <section id="hero">
+            <h2>Welcome to EduHub</h2>
+            <p>Your source for educational insights, schools, and community information.</p>
+        </section>
+
         <section id="recent-posts">
             <h2>Recent Posts</h2>
             <div class="posts-container" id="recent-posts-container"></div>
@@ -35,7 +42,7 @@
         </section>
 
         <section id="districts">
-            <h2>Available Districts</h2>
+            <h2>Explore Districts</h2>
             <div class="districts-grid" id="districts-container"></div>
         </section>
 
@@ -45,7 +52,7 @@
         </section>
 
         <section id="recommended-posts">
-            <h2>Recommended Posts</h2>
+            <h2>Recommended for You</h2>
             <div class="posts-container" id="recommended-container"></div>
         </section>
     </main>
@@ -105,9 +112,13 @@
                 `).join('') :
                 '<p>No schools found.</p>';
 
-            // Display Recommended Posts (random 3 posts)
+            // Display Recommended Posts (3 posts with similar tags or type)
             const recommendedPosts = posts
-                .sort(() => Math.random() - 0.5)
+                .sort((a, b) => {
+                    const aTagMatches = a.tags ? a.tags.filter(tag => posts[0].tags.includes(tag)).length : 0;
+                    const bTagMatches = b.tags ? b.tags.filter(tag => posts[0].tags.includes(tag)).length : 0;
+                    return bTagMatches - aTagMatches || new Date(b.date) - new Date(a.date);
+                })
                 .slice(0, 3);
             document.getElementById('recommended-container').innerHTML = recommendedPosts.length ?
                 recommendedPosts.map(post => createPostCard(post)).join('') :
