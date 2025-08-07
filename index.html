@@ -30,8 +30,10 @@
         <section id="hero">
             <h2>Welcome to Kashur Koam</h2>
             <div class="search-container">
-                <input type="text" id="search-bar" placeholder="Search posts, districts, or schools...">
-                <button onclick="searchContent()"><i class="fas fa-search"></i></button>
+                <div class="search-wrapper">
+                    <input type="text" id="search-bar" placeholder="Search posts, districts, or schools...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
                 <a href="/pages/article.html" class="add-article-btn">Add Article</a>
             </div>
         </section>
@@ -128,10 +130,17 @@
             document.getElementById('recommended-container').innerHTML = recommendedPosts.length ?
                 recommendedPosts.map(post => createPostCard(post)).join('') :
                 '<p>No recommended posts found.</p>';
+
+            // Trigger search on Enter key press
+            document.getElementById('search-bar').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    searchContent();
+                }
+            });
         });
 
         function searchContent() {
-            const query = document.getElementById('search-bar').value;
+            const query = document.getElementById('search-bar').value.trim();
             if (query) {
                 window.location.href = `/pages/search.html?query=${encodeURIComponent(query)}`;
             }
