@@ -240,27 +240,44 @@ footer {
 .error-container a:hover {
     background-color: #0b0080;
 }
-/* styles for the search bar and buttons in the hero section */
+/* Search container styling */
 .search-container {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 0; /* No gap to keep elements tight */
     margin-top: 20px;
-    flex-wrap: wrap;
+    max-width: 600px; /* Limit total width */
+    width: 100%;
+}
+
+/* Wrapper for search bar and icon */
+.search-wrapper {
+    position: relative;
+    flex-grow: 1;
+    max-width: 400px;
 }
 
 #search-bar {
     width: 100%;
-    max-width: 400px;
-    padding: 10px 15px;
+    padding: 10px 15px 10px 35px; /* Left padding for icon */
     font-size: 16px;
     border: 2px solid #ccc;
-    border-radius: 25px;
+    border-radius: 25px 0 0 25px; /* Rounded left, straight right */
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
     background-color: #fff;
     color: #333;
+}
+
+/* Search icon inside the bar */
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 16px;
 }
 
 /* Focus and hover states for search bar */
@@ -270,37 +287,24 @@ footer {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-/* Search button */
-.search-container button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 25px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.search-container button:hover {
-    background-color: #0056b3;
-    transform: scale(1.05);
-}
-
 /* Add Article button */
 .add-article-btn {
     padding: 10px 20px;
     font-size: 16px;
     text-decoration: none;
-    border-radius: 25px;
+    border-radius: 0 25px 25px 0; /* Rounded right, straight left */
     background-color: #28a745;
     color: #fff;
     transition: background-color 0.3s ease, transform 0.2s ease;
     text-align: center;
+    border: 2px solid #28a745;
+    border-left: none; /* Seamless join with search bar */
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
 .add-article-btn:hover {
     background-color: #218838;
+    border-color: #218838;
     transform: scale(1.05);
 }
 
@@ -318,41 +322,42 @@ footer {
         box-shadow: 0 0 5px rgba(77, 171, 247, 0.3);
     }
 
-    .search-container button {
-        background-color: #4dabf7;
-    }
-
-    .search-container button:hover {
-        background-color: #3398db;
+    .search-icon {
+        color: #ccc;
     }
 
     .add-article-btn {
         background-color: #2ecc71;
+        border-color: #2ecc71;
     }
 
     .add-article-btn:hover {
         background-color: #27ae60;
+        border-color: #27ae60;
     }
 }
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
     .search-container {
-        flex-direction: column;
-        gap: 15px;
+        flex-direction: row; /* Keep in one row */
+        max-width: 100%;
+        padding: 0 10px;
+    }
+
+    .search-wrapper {
+        max-width: 70%; /* Adjust to fit beside button */
     }
 
     #search-bar {
-        max-width: 100%;
+        font-size: 14px; /* Slightly smaller for small screens */
     }
 
-    .search-container button,
     .add-article-btn {
-        width: 100%;
-        max-width: 200px;
+        font-size: 14px;
+        padding: 10px 15px;
     }
 }
-
 /* Responsive Design */
 @media (min-width: 1920px) {
     main {
