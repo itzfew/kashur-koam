@@ -240,6 +240,118 @@ footer {
 .error-container a:hover {
     background-color: #0b0080;
 }
+/* styles for the search bar and buttons in the hero section */
+.search-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+#search-bar {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 25px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
+    color: #333;
+}
+
+/* Focus and hover states for search bar */
+#search-bar:focus,
+#search-bar:hover {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Search button */
+.search-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 25px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.search-container button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Add Article button */
+.add-article-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 25px;
+    background-color: #28a745;
+    color: #fff;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+}
+
+.add-article-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+    #search-bar {
+        background-color: #333;
+        color: #fff;
+        border-color: #555;
+    }
+
+    #search-bar:focus,
+    #search-bar:hover {
+        border-color: #4dabf7;
+        box-shadow: 0 0 5px rgba(77, 171, 247, 0.3);
+    }
+
+    .search-container button {
+        background-color: #4dabf7;
+    }
+
+    .search-container button:hover {
+        background-color: #3398db;
+    }
+
+    .add-article-btn {
+        background-color: #2ecc71;
+    }
+
+    .add-article-btn:hover {
+        background-color: #27ae60;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .search-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    #search-bar {
+        max-width: 100%;
+    }
+
+    .search-container button,
+    .add-article-btn {
+        width: 100%;
+        max-width: 200px;
+    }
+}
 
 /* Responsive Design */
 @media (min-width: 1920px) {
