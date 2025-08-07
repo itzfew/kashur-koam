@@ -61,6 +61,18 @@ main {
     border-radius: 4px;
     min-height: calc(100vh - 200px);
 }
+.add-article-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    text-decoration: none;
+    border-radius: 0 25px 25px 0; /* Rounded right, straight left */
+    color: #000000;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center;
+    border: 2px solid #28a745;
+    border-left: none; /* Seamless join with search bar */
+    white-space: nowrap; /* Prevent text wrapping */
+}
 
 section {
     margin-bottom: 3.5rem;
