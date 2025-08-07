@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Search results for districts, villages, and schools on Kashur Koam.">
-    <meta name="keywords" content="search, districts, villages, schools, Kashur Koam">
+    <meta name="description" content="Search results for districts, villages, schools, and posts on Kashur Koam.">
+    <meta name="keywords" content="search, districts, villages, schools, posts, Kashur Koam">
     <title>Search Results - Kashur Koam</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -24,6 +24,10 @@
         <section id="search-results">
             <h2>Search Results</h2>
             <div class="posts-container" id="results-container"></div>
+            <div id="not-found" style="display: none; text-align: center; margin-top: 20px;">
+                <p>No results found.</p>
+                <a href="/" class="home-button">Return to Home</a>
+            </div>
         </section>
     </main>
 
@@ -36,33 +40,59 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const label = urlParams.get('label');
+            const query = urlParams.get('query');
+            const resultsContainer = document.getElementById('results-container');
+            const notFoundDiv = document.getElementById('not-found');
+            const header = document.querySelector('h2');
 
-            if (!label) {
-                document.getElementById('results-container').innerHTML = '<p>No search parameter provided.</p>';
+            // Check if no parameters are provided
+            if (!label && !query) {
+                header.textContent = 'No Search Parameters';
+                resultsContainer.style.display = 'none';
+                notFoundDiv.style.display = 'block';
+                notFoundDiv.querySelector('p').textContent = 'No search parameters provided.';
                 return;
             }
 
-            document.querySelector('h2').textContent = label.startsWith('school_') ?
-                `Schools in ${label.replace('school_', '')}` :
-                `Villages in ${label}`;
-
             const posts = await fetchAllPosts();
-            let filteredPosts;
+            let filteredPosts = [];
 
-            if (label.startsWith('school_')) {
-                const district = label.replace('school_', '');
+            if (label) {
+                // Handle label-based search (districts or schools)
+                if (label.startsWith('school_')) {
+                    const district = label.replace('school_', '');
+                    header.textContent = `Schools in ${district}`;
+                    filteredPosts = posts.filter(post => 
+                        post.type === 'school' && post.district === district
+                    );
+                } else {
+                    header.textContent = `Villages in ${label}`;
+                    filteredPosts = posts.filter(post => 
+                        post.type === 'village' && post.district === label
+                    );
+                }
+            } else if (query) {
+                // Handle query-based search (search across titles, content, tags)
+                header.textContent = `Search Results for "${query}"`;
+                const searchTerm = query.toLowerCase();
                 filteredPosts = posts.filter(post => 
-                    post.type === 'school' && post.district === district
-                );
-            } else {
-                filteredPosts = posts.filter(post => 
-                    post.type === 'village' && post.district === label
+                    (post.title && post.title.toLowerCase().includes(searchTerm)) ||
+                    (post.content && post.content.toLowerCase().includes(searchTerm)) ||
+                    (post.tags && post.tags.some(tag => tag.toLowerCase().includes(searchTerm)))
                 );
             }
 
-            document.getElementById('results-container').innerHTML = filteredPosts.length ?
-                filteredPosts.map(post => createPostCard(post)).join('') :
-                '<p>No results found.</p>';
+            // Display results or not found message
+            if (filteredPosts.length > 0) {
+                resultsContainer.innerHTML = filteredPosts.map(post => createPostCard(post)).join('');
+                resultsContainer.style.display = 'block';
+                notFoundDiv.style.display = 'none';
+            } else {
+                header.textContent = label ? header.textContent : `No Results for "${query}"`;
+                resultsContainer.style.display = 'none';
+                notFoundDiv.style.display = 'block';
+                notFoundDiv.querySelector('p').textContent = 'No results found for your search.';
+            }
         });
     </script>
 </body>
