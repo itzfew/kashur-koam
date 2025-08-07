@@ -9,121 +9,6 @@
     <title>Submit Article - Kashur Koam</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<style>
-    /* Submit article section */
-#submit-article {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-/* Form group */
-.form-group {
-    margin-bottom: 15px;
-}
-
-.form-group label {
-    display: block;
-    font-size: 16px;
-    margin-bottom: 5px;
-    color: #333;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    border: 2px solid #ccc;
-    border-radius: 5px;
-    outline: none;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
-}
-
-/* Submit button */
-#article-form button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-#article-form button:hover {
-    background-color: #0056b3;
-    transform: scale(1.02);
-}
-
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-    #submit-article {
-        background-color: #333;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    }
-
-    .form-group label {
-        color: #ddd;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        background-color: #444;
-        color: #fff;
-        border-color: #555;
-    }
-
-    .form-group input:focus,
-    .form-group textarea:focus,
-    .form-group select:focus {
-        border-color: #4dabf7;
-        box-shadow: 0 0 5px rgba(77, 171, 247, 0.3);
-    }
-
-    #article-form button {
-        background-color: #4dabf7;
-    }
-
-    #article-form button:hover {
-        background-color: #3398db;
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 600px) {
-    #submit-article {
-        margin: 10px;
-        padding: 15px;
-    }
-
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-        font-size: 14px;
-    }
-
-    #article-form button {
-        font-size: 14px;
-        padding: 10px;
-    }
-}
-</style>
 </head>
 <body>
     <header>
@@ -189,8 +74,40 @@
                             <input type="text" id="district" name="district" required>
                         </div>
                         <div class="form-group">
-                            <label for="content">Content/Description:</label>
-                            <textarea id="content" name="content" rows="6" required></textarea>
+                            <label for="state">State:</label>
+                            <input type="text" id="state" name="state" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tehsil">Tehsil:</label>
+                            <input type="text" id="tehsil" name="tehsil" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalFamilies">Total Families:</label>
+                            <input type="number" id="totalFamilies" name="totalFamilies" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalPopulation">Total Population:</label>
+                            <input type="number" id="totalPopulation" name="totalPopulation" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="malePopulation">Male Population:</label>
+                            <input type="number" id="malePopulation" name="malePopulation" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="femalePopulation">Female Population:</label>
+                            <input type="number" id="femalePopulation" name="femalePopulation" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="institute1">Educational Institute 1 (Optional):</label>
+                            <input type="text" id="institute1" name="institute1">
+                        </div>
+                        <div class="form-group">
+                            <label for="institute2">Educational Institute 2 (Optional):</label>
+                            <input type="text" id="institute2" name="institute2">
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode:</label>
+                            <input type="text" id="pincode" name="pincode" required>
                         </div>
                         <div class="form-group">
                             <label for="tags">Tags (up to 3, comma-separated):</label>
@@ -212,8 +129,35 @@
                             <input type="text" id="district" name="district" required>
                         </div>
                         <div class="form-group">
-                            <label for="content">Content/Description:</label>
-                            <textarea id="content" name="content" rows="6" required></textarea>
+                            <label for="location">School Location:</label>
+                            <input type="text" id="location" name="location" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="pincode">Pincode:</label>
+                            <input type="text" id="pincode" name="pincode" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="principal">Principal Name:</label>
+                            <input type="text" id="principal" name="principal" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalTeachers">Total Teachers (Approx.):</label>
+                            <input type="number" id="totalTeachers" name="totalTeachers" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="totalStudents">Total Students (Approx.):</label>
+                            <input type="number" id="totalStudents" name="totalStudents" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="grade">Grade Level:</label>
+                            <select id="grade" name="grade" required>
+                                <option value="" disabled selected>Select Grade Level</option>
+                                <option value="Up to 8th">Up to 8th</option>
+                                <option value="Up to 10th">Up to 10th</option>
+                                <option value="Up to 12th">Up to 12th</option>
+                                <option value="Higher Secondary">Higher Secondary</option>
+                                <option value="College">College</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="tags">Tags (up to 3, comma-separated):</label>
@@ -247,7 +191,6 @@
                 e.preventDefault();
                 const type = typeSelect.value;
                 const author = document.getElementById('author')?.value.trim();
-                const content = document.getElementById('content')?.value.trim();
                 let tags = document.getElementById('tags')?.value.trim();
 
                 // Process tags (limit to 3)
@@ -257,11 +200,28 @@
                 const date = new Date().toISOString().split('T')[0];
 
                 let jsonData;
-                let fileName;
+                let content;
 
                 if (type === 'village') {
                     const village = document.getElementById('village')?.value.trim();
                     const district = document.getElementById('district')?.value.trim();
+                    const state = document.getElementById('state')?.value.trim();
+                    const tehsil = document.getElementById('tehsil')?.value.trim();
+                    const totalFamilies = document.getElementById('totalFamilies')?.value;
+                    const totalPopulation = document.getElementById('totalPopulation')?.value;
+                    const malePopulation = document.getElementById('malePopulation')?.value;
+                    const femalePopulation = document.getElementById('femalePopulation')?.value;
+                    const institute1 = document.getElementById('institute1')?.value.trim() || '';
+                    const institute2 = document.getElementById('institute2')?.value.trim() || '';
+                    const pincode = document.getElementById('pincode')?.value.trim();
+
+                    // Generate content with bold fields
+                    content = `<p><b>${village}</b> is a village located in <b>${tehsil}</b> tehsil, <b>${district}</b> district, <b>${state}</b>. It has a total of <b>${totalFamilies}</b> families and a population of <b>${totalPopulation}</b>, comprising <b>${malePopulation}</b> males and <b>${femalePopulation}</b> females.`;
+                    if (institute1 || institute2) {
+                        content += ` The village is served by educational institutions such as ${institute1 ? `<b>${institute1}</b>` : ''}${institute1 && institute2 ? ' and ' : ''}${institute2 ? `<b>${institute2}</b>` : ''}, contributing to the community's educational development.`;
+                    }
+                    content += ` The pincode for the village is <b>${pincode}</b>.</p>`;
+
                     jsonData = {
                         title: `${village}, ${district}`,
                         author,
@@ -272,10 +232,19 @@
                         content,
                         tags
                     };
-                    fileName = `${village}, ${district}.json`;
                 } else if (type === 'school') {
                     const school = document.getElementById('school')?.value.trim();
                     const district = document.getElementById('district')?.value.trim();
+                    const location = document.getElementById('location')?.value.trim();
+                    const pincode = document.getElementById('pincode')?.value.trim();
+                    const principal = document.getElementById('principal')?.value.trim();
+                    const totalTeachers = document.getElementById('totalTeachers')?.value;
+                    const totalStudents = document.getElementById('totalStudents')?.value;
+                    const grade = document.getElementById('grade')?.value;
+
+                    // Generate content with bold fields
+                    content = `<p><b>${school}</b> is located in <b>${location}</b>, <b>${district}</b> district, with the pincode <b>${pincode}</b>. The school is led by Principal <b>${principal}</b> and has approximately <b>${totalTeachers}</b> teachers and <b>${totalStudents}</b> students. It offers education <b>${grade}</b>, serving the educational needs of the local community.</p>`;
+
                     jsonData = {
                         title: `${school}, ${district}`,
                         author,
@@ -285,9 +254,9 @@
                         content,
                         tags
                     };
-                    fileName = `${school}, ${district}.json`;
                 } else if (type === 'other') {
                     const title = document.getElementById('title')?.value.trim();
+                    content = document.getElementById('content')?.value.trim();
                     jsonData = {
                         title,
                         author,
@@ -296,27 +265,15 @@
                         content,
                         tags
                     };
-                    fileName = `${title}.json`;
                 }
 
-                // Create JSON blob
+                // Create JSON string
                 const jsonString = JSON.stringify(jsonData, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
 
-                // Create email draft
+                // Create email draft with JSON in body
                 const subject = encodeURIComponent(`Article Submission: ${jsonData.title}`);
-                const body = encodeURIComponent('Please find the attached article submission.');
+                const body = encodeURIComponent(`Article Submission:\n\n${jsonString}`);
                 const mailtoLink = `mailto:itzme.eduhub.contact@gmail.com?subject=${subject}&body=${body}`;
-
-                // Trigger file download
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = fileName.replace(/[^a-zA-Z0-9, ]/g, '_'); // Replace invalid characters for filename
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
 
                 // Open email client
                 window.location.href = mailtoLink;
