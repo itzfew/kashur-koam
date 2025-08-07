@@ -287,26 +287,6 @@ footer {
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
-/* Add Article button */
-.add-article-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    text-decoration: none;
-    border-radius: 0 25px 25px 0; /* Rounded right, straight left */
-    background-color: #28a745;
-    color: #fff;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    text-align: center;
-    border: 2px solid #28a745;
-    border-left: none; /* Seamless join with search bar */
-    white-space: nowrap; /* Prevent text wrapping */
-}
-
-.add-article-btn:hover {
-    background-color: #218838;
-    border-color: #218838;
-    transform: scale(1.05);
-}
 
 /* Dark theme adjustments */
 @media (prefers-color-scheme: dark) {
@@ -325,17 +305,6 @@ footer {
     .search-icon {
         color: #ccc;
     }
-
-    .add-article-btn {
-        background-color: #2ecc71;
-        border-color: #2ecc71;
-    }
-
-    .add-article-btn:hover {
-        background-color: #27ae60;
-        border-color: #27ae60;
-    }
-}
 
 /* Responsive adjustments */
 @media (max-width: 600px) {
