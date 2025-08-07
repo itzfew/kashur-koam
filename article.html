@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Submit an article for Kashur Koam about villages, schools, or other educational topics.">
+    <meta name="keywords" content="submit, article, villages, schools, education, Kashur Koam">
+    <meta name="author" content="Kashur Koam Team">
+    <title>Submit Article - Kashur Koam</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1><a href="/">Kashur Koam</a></h1>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/pages/contact.html">Contact</a>
+                <a href="/pages/privacy-policy.html">Privacy Policy</a>
+                <a href="/pages/terms-and-conditions.html">Terms</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="submit-article">
+            <h2>Submit an Article</h2>
+            <form id="article-form">
+                <div class="form-group">
+                    <label for="type">Content Type:</label>
+                    <select id="type" name="type" required>
+                        <option value="" disabled selected>Select Type</option>
+                        <option value="village">Village</option>
+                        <option value="school">School</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div id="dynamic-fields"></div>
+
+                <button type="submit">Submit</button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Kashur Koam. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('article-form');
+            const typeSelect = document.getElementById('type');
+            const dynamicFields = document.getElementById('dynamic-fields');
+
+            // Function to render dynamic fields based on type
+            typeSelect.addEventListener('change', () => {
+                const type = typeSelect.value;
+                dynamicFields.innerHTML = '';
+
+                if (type === 'village') {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="author">Your Name:</label>
+                            <input type="text" id="author" name="author" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="village">Village Name:</label>
+                            <input type="text" id="village" name="village" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District:</label>
+                            <input type="text" id="district" name="district" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">Content/Description:</label>
+                            <textarea id="content" name="content" rows="6" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags (up to 3, comma-separated):</label>
+                            <input type="text" id="tags" name="tags" placeholder="e.g., village, education" maxlength="100">
+                        </div>
+                    `;
+                } else if (type === 'school') {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="author">Your Name:</label>
+                            <input type="text" id="author" name="author" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="school">School Name:</label>
+                            <input type="text" id="school" name="school" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="district">District:</label>
+                            <input type="text" id="district" name="district" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">Content/Description:</label>
+                            <textarea id="content" name="content" rows="6" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags (up to 3, comma-separated):</label>
+                            <input type="text" id="tags" name="tags" placeholder="e.g., school, private school" maxlength="100">
+                        </div>
+                    `;
+                } else if (type === 'other') {
+                    dynamicFields.innerHTML = `
+                        <div class="form-group">
+                            <label for="author">Your Name:</label>
+                            <input type="text" id="author" name="author" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="title">Title:</label>
+                            <input type="text" id="title" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="content">Content/Description:</label>
+                            <textarea id="content" name="content" rows="6" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">Tags (up to 3, comma-separated):</label>
+                            <input type="text" id="tags" name="tags" placeholder="e.g., education, community" maxlength="100">
+                        </div>
+                    `;
+                }
+            });
+
+            // Handle form submission
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const type = typeSelect.value;
+                const author = document.getElementById('author')?.value.trim();
+                const content = document.getElementById('content')?.value.trim();
+                let tags = document.getElementById('tags')?.value.trim();
+
+                // Process tags (limit to 3)
+                tags = tags ? tags.split(',').map(tag => tag.trim()).filter(tag => tag).slice(0, 3) : [];
+
+                // Get current date in YYYY-MM-DD format
+                const date = new Date().toISOString().split('T')[0];
+
+                let jsonData;
+                let fileName;
+
+                if (type === 'village') {
+                    const village = document.getElementById('village')?.value.trim();
+                    const district = document.getElementById('district')?.value.trim();
+                    jsonData = {
+                        title: `${village}, ${district}`,
+                        author,
+                        date,
+                        type,
+                        district,
+                        village,
+                        content,
+                        tags
+                    };
+                    fileName = `${village}, ${district}.json`;
+                } else if (type === 'school') {
+                    const school = document.getElementById('school')?.value.trim();
+                    const district = document.getElementById('district')?.value.trim();
+                    jsonData = {
+                        title: `${school}, ${district}`,
+                        author,
+                        date,
+                        type,
+                        district,
+                        content,
+                        tags
+                    };
+                    fileName = `${school}, ${district}.json`;
+                } else if (type === 'other') {
+                    const title = document.getElementById('title')?.value.trim();
+                    jsonData = {
+                        title,
+                        author,
+                        date,
+                        type,
+                        content,
+                        tags
+                    };
+                    fileName = `${title}.json`;
+                }
+
+                // Create JSON blob
+                const jsonString = JSON.stringify(jsonData, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                // Create email draft
+                const subject = encodeURIComponent(`Article Submission: ${jsonData.title}`);
+                const body = encodeURIComponent('Please find the attached article submission.');
+                const mailtoLink = `mailto:itzme.eduhub.contact@gmail.com?subject=${subject}&body=${body}`;
+
+                // Trigger file download
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName.replace(/[^a-zA-Z0-9, ]/g, '_'); // Replace invalid characters for filename
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+
+                // Open email client
+                window.location.href = mailtoLink;
+            });
+        });
+    </script>
+</body>
+</html>
