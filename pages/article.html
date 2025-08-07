@@ -9,6 +9,125 @@
     <title>Submit Article - Kashur Koam</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Submit article section */
+#submit-article {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Form group */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+/* Submit button */
+#article-form button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#article-form button:hover {
+    background-color: #0056b3;
+    transform: scale(1.02);
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+    #submit-article {
+        background-color: #333;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-group label {
+        color: #ddd;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        background-color: #444;
+        color: #fff;
+        border-color: #555;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+        border-color: #4dabf7;
+        box-shadow: 0 0 5px rgba(77, 171, 247, 0.3);
+    }
+
+    #article-form button {
+        background-color: #4dabf7;
+    }
+
+    #article-form button:hover {
+        background-color: #3398db;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    #submit-article {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 14px;
+    }
+
+    #article-form button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+</style>
 </head>
 <body>
     <header>
