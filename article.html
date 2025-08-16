@@ -1,6 +1,3 @@
-
-
-<!-- article.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,57 +8,164 @@
     <meta name="keywords" content="Kashmir, articles, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="loading" class="loading-spinner" style="display: none;">
         <div class="spinner"></div>
+        <div class="loading-text">Loading...</div>
     </div>
+    
     <header>
-        <h1>Kashurpedia</h1>
+        <h1><a href="index.html">Kashurpedia</a></h1>
         <div id="user-profile">
             <a href="login.html">Login</a>
         </div>
         <div class="search-container">
-            <input type="text" id="search-bar" placeholder="Search articles...">
-            <button onclick="searchArticles()">Search</button>
+            <input type="text" id="search-bar" placeholder="Search articles..." aria-label="Search articles">
+            <button onclick="searchArticles()" aria-label="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                </svg>
+            </button>
         </div>
     </header>
+    
+    <nav class="breadcrumbs">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li id="article-category"></li>
+            <li id="article-current"></li>
+        </ul>
+    </nav>
+    
     <main class="article-main">
         <div class="article-container">
-            <h2 id="article-title"></h2>
-            <div id="infobox" class="infobox"></div>
-            <div id="article-content" class="article-content"></div>
-            <div class="article-actions">
-                <a href="#" id="edit-link" class="edit-link">Edit</a>
-            </div>
-            <section id="citations">
-                <h3>Citations</h3>
-                <ul id="citations-list"></ul>
-            </section>
-            <section id="edit-history">
-                <h3>Edit History</h3>
-                <ul id="history-list"></ul>
-            </section>
-            <section id="comments">
-                <h3>Comments</h3>
-                <ul id="comments-list"></ul>
-                <textarea id="new-comment" placeholder="Add your comment..."></textarea>
-                <button onclick="submitComment()">Add Comment</button>
-            </section>
+            <article>
+                <h2 id="article-title"></h2>
+                <div id="infobox" class="infobox"></div>
+                <div id="article-content" class="article-content"></div>
+                
+                <div class="article-actions">
+                    <a href="#" id="edit-link" class="edit-link">Edit this article</a>
+                    <span class="article-history-link">
+                        <a href="#" id="history-link">View edit history</a>
+                    </span>
+                </div>
+                
+                <section id="citations" class="article-section">
+                    <h3>References</h3>
+                    <ul id="citations-list"></ul>
+                </section>
+                
+                <section id="comments" class="article-section">
+                    <h3>Discussion</h3>
+                    <div class="comment-form">
+                        <h4>Post a comment</h4>
+                        <textarea id="new-comment" placeholder="Share your thoughts about this article..." aria-label="Comment text"></textarea>
+                        <button onclick="submitComment()" class="submit-button">Post Comment</button>
+                    </div>
+                    <ul id="comments-list" class="comments-list"></ul>
+                </section>
+            </article>
+            
+            <aside class="article-sidebar">
+                <section class="related-articles">
+                    <h3>Related Articles</h3>
+                    <ul id="related-list"></ul>
+                </section>
+                
+                <section class="article-tools">
+                    <h3>Tools</h3>
+                    <ul>
+                        <li><a href="#" id="print-link">Print/export</a></li>
+                        <li><a href="#" id="pdf-link">Download as PDF</a></li>
+                    </ul>
+                </section>
+            </aside>
         </div>
     </main>
+    
+    <footer>
+        <div class="footer-content">
+            <section class="footer-section">
+                <h4>Kashurpedia</h4>
+                <p>The free encyclopedia of Kashmir</p>
+            </section>
+            <section class="footer-section">
+                <h4>Contribute</h4>
+                <ul>
+                    <li><a href="submit.html">Create new article</a></li>
+                    <li><a href="#">Community portal</a></li>
+                </ul>
+            </section>
+            <section class="footer-section">
+                <h4>About</h4>
+                <ul>
+                    <li><a href="#">About Kashurpedia</a></li>
+                    <li><a href="#">Contact us</a></li>
+                </ul>
+            </section>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Kashurpedia. Content is available under Creative Commons Attribution-ShareAlike unless otherwise noted.</p>
+        </div>
+    </footer>
+    
     <script src="config.js"></script>
     <script src="app.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
         document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
-            loadArticle(id);
-            loadEditHistory(id);
-            loadComments(id);
-            document.getElementById('edit-link').href = `edit.html?id=${encodeURIComponent(id)}`;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            
+            if (id) {
+                loadArticle(id);
+                loadEditHistory(id);
+                loadComments(id);
+                document.getElementById('edit-link').href = `edit.html?id=${encodeURIComponent(id)}`;
+                document.getElementById('history-link').href = `#edit-history`;
+                
+                // Load related articles
+                setTimeout(() => {
+                    const category = document.getElementById('category')?.value;
+                    if (category) {
+                        loadRelatedArticles(category, id);
+                    }
+                }, 500);
+            }
+            
+            // Add print functionality
+            document.getElementById('print-link')?.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.print();
+            });
         });
+        
+        async function loadRelatedArticles(category, excludeId) {
+            try {
+                const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${encodeURIComponent(category)}`);
+                const articles = await response.json();
+                const relatedList = document.getElementById('related-list');
+                
+                if (articles.length > 0) {
+                    relatedList.innerHTML = '';
+                    const filtered = articles.filter(a => a.id !== excludeId).slice(0, 5);
+                    
+                    filtered.forEach(article => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="article.html?id=${encodeURIComponent(article.id)}">${article.title}</a>`;
+                        relatedList.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading related articles:', error);
+            }
+        }
     </script>
 </body>
 </html>
