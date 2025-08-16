@@ -113,28 +113,43 @@ async function searchArticles() {
 function parseWikiText(content, idMap) {
     let html = content;
     // Convert ==Section== to <h2>Section</h2>
-    html = html.replace(/^==\s*([^=]+)\s*==$/gm, '<h2>$1</h2>');
+    html = html.replace(/^==\s*([^=\n]+)\s*==$/gm, '<h2>$1</h2>');
     // Convert ===Subsection=== to <h3>Subsection</h3>
-    html = html.replace(/^===\s*([^=]+)\s*===$/gm, '<h3>$1</h3>');
+    html = html.replace(/^===\s*([^=\n]+)\s*===$/gm, '<h3>$1</h3>');
     // Convert '''bold''' to <strong>bold</strong>
     html = html.replace(/'''([^']+)'''/g, '<strong>$1</strong>');
     // Convert ''italic'' to <em>italic</em>
     html = html.replace(/''([^']+)''/g, '<em>$1</em>');
     // Convert * Item to <ul><li>Item</li></ul>
-    html = html.replace(/^\*\s*(.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    let listOpen = false;
+    html = html.split('\n').map(line => {
+        if (line.match(/^\*\s*(.+)$/)) {
+            if (!listOpen) {
+                listOpen = true;
+                return `<ul><li>${line.replace(/^\*\s*(.+)$/, '$1')}</li>`;
+            }
+            return `<li>${line.replace(/^\*\s*(.+)$/, '$1')}</li>`;
+        } else if (listOpen) {
+            listOpen = false;
+            return `</ul>${line}`;
+        }
+        return line;
+    }).join('\n');
+    if (listOpen) {
+        html += '</ul>';
+    }
     // Automatically link article titles
     for (const [title, titleId] of Object.entries(idMap)) {
-        const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b`, 'g');
+        const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b(?![^\[]*\]\])`, 'g');
         html = html.replace(regex, `<a href="article.html?id=${encodeURIComponent(titleId)}">${title}</a>`);
     }
     // Convert [[Link]] to <a href="article.html?id=ID">Link</a>
     html = html.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
         return `<a href="article.html?id=${encodeURIComponent(idMap[title] || '')}">${title}</a>`;
     });
-    // Wrap paragraphs
+    // Wrap non-heading/list lines in <p> tags
     html = html.split('\n').map(line => {
-        if (!line.match(/^(<h[23]|<ul|<li)/)) {
+        if (!line.match(/^(<h[23]|<ul>|<li>|<\/ul>)/) && line.trim()) {
             return `<p>${line}</p>`;
         }
         return line;
@@ -168,8 +183,9 @@ async function loadArticle(id) {
             });
             return citation;
         });
+        content = parseWikiText(content, article.idMap);
         content = content.replace(/{{Cite(.*?)}}/g, (match, index) => `<sup>[${citationMatches.indexOf(match) + 1}]</sup>`);
-        document.getElementById('article-content').innerHTML = parseWikiText(content, article.idMap);
+        document.getElementById('article-content').innerHTML = content;
         const citationList = document.getElementById('citations-list');
         citationList.innerHTML = '';
         citations.forEach((citation, index) => {
@@ -220,7 +236,7 @@ function validateContent(content, category) {
         }
     }
     // Check for References section
-    if (!content.match(/==References==/)) {
+    if (!content.match(/^==\s*References\s*==$/m)) {
         errors.push('Missing ==References== section. Add a References section with at least one {{Cite}} template.');
     }
     // Check for valid Cite templates
@@ -236,6 +252,20 @@ function validateContent(content, category) {
             errors.push(`Citation ${index + 1} missing title. Use |title= in {{Cite}} template.`);
         }
     });
+    // Check for required sections
+    const requiredSections = {
+        'Villages': ['History', 'Geography', 'References'],
+        'Districts': ['Overview', 'Economy', 'References'],
+        'Famous People': ['Biography', 'Achievements', 'References'],
+        'Colleges': ['Courses', 'Facilities', 'References'],
+        'Schools': ['Curriculum', 'Extracurricular', 'References'],
+        'Mosques': ['Architecture', 'History', 'References']
+    }[category];
+    for (const section of requiredSections) {
+        if (!content.match(new RegExp(`^==\\s*${section}\\s*==$`, 'm'))) {
+            errors.push(`Missing required section: ==${section}==`);
+        }
+    }
     return errors;
 }
 
