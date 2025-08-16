@@ -1,4 +1,5 @@
 
+
 // templates.js
 const TEMPLATES = {
     'Villages': '{{Infobox\n|name = \n|district = \n|population = \n}}\n\n==History==\n\n==Geography==\n\n[[Link to related article]]',
