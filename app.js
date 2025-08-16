@@ -19,7 +19,7 @@ async function login() {
         localStorage.setItem('name', data.name);
         window.location.href = 'index.html';
     } else {
-        alert('Login failed');
+        alert('Login failed: ' + (data.message || 'Invalid credentials'));
     }
 }
 
@@ -40,10 +40,19 @@ async function signup() {
 }
 
 async function loadCategories() {
+    const defaultCategories = [
+        {name: 'Villages'},
+        {name: 'Districts'},
+        {name: 'Famous People'},
+        {name: 'Colleges'},
+        {name: 'Schools'},
+        {name: 'Mosques'}
+    ];
     try {
         const response = await fetch(`${SCRIPT_URL}?action=getCategories`);
-        if (!response.ok) throw new Error('Failed to fetch categories');
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const categories = await response.json();
+        console.log('Fetched categories:', categories);
         const list = document.getElementById('category-list');
         const select = document.getElementById('category');
         if (list) {
@@ -56,6 +65,13 @@ async function loadCategories() {
         }
         if (select) {
             select.innerHTML = '';
+            if (categories.length === 0) {
+                console.warn('No categories fetched, using defaults');
+                categories.push(...defaultCategories);
+                document.getElementById('category-error').style.display = 'block';
+            } else {
+                document.getElementById('category-error').style.display = 'none';
+            }
             categories.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.name;
@@ -65,7 +81,18 @@ async function loadCategories() {
         }
     } catch (error) {
         console.error('Error loading categories:', error);
-        alert('Failed to load categories. Please try again.');
+        const select = document.getElementById('category');
+        if (select) {
+            select.innerHTML = '';
+            defaultCategories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                select.appendChild(option);
+            });
+            document.getElementById('category-error').style.display = 'block';
+        }
+        alert('Failed to load categories. Using default categories. Error: ' + error.message);
     }
 }
 
