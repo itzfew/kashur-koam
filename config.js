@@ -1,2 +1,2 @@
 // config.js
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwgVrZ-49IsC8WNB-EnSREI7XtQ3ipIxCdU5D3ZiFYEhSCDulRik6vB71eb6KaKpCn3/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeqhsW2wIYWb3X-TJffBMIriYVICRM7GhiIZNDmUxaV4cT1_Lc8X01Dcnq1aC7AZosNg/exec';
