@@ -1,10 +1,12 @@
+
+
 <!-- article.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kashurpedia - Article</title>
+    <title id="page-title">Kashurpedia - Article</title>
     <meta name="description" content="Read detailed articles about Kashmir's culture, history, and landmarks on Kashurpedia.">
     <meta name="keywords" content="Kashmir, articles, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
     <meta name="robots" content="index, follow">
@@ -27,13 +29,15 @@
     <main class="article-main">
         <div class="article-container">
             <h2 id="article-title"></h2>
-            <div id="infobox"></div>
-            <div id="article-content"></div>
+            <div id="infobox" class="infobox"></div>
+            <div id="article-content" class="article-content"></div>
+            <div class="article-actions">
+                <a href="#" id="edit-link" class="edit-link">Edit</a>
+            </div>
             <section id="citations">
                 <h3>Citations</h3>
                 <ul id="citations-list"></ul>
             </section>
-            <a href="#" id="edit-link" class="edit-link">Edit</a>
             <section id="edit-history">
                 <h3>Edit History</h3>
                 <ul id="history-list"></ul>
