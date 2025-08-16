@@ -1,36 +1,9 @@
-// Define structured templates (infobox-style) for categories/types
-const ARTICLE_TEMPLATES = {
-  "Village": [
-    { key: "district", label: "District" },
-    { key: "population", label: "Population" },
-    { key: "coordinates", label: "Coordinates (lat,lng)" },
-    { key: "pincode", label: "PIN Code" }
-  ],
-  "District": [
-    { key: "state", label: "State/UT" },
-    { key: "headquarters", label: "Headquarters" },
-    { key: "population", label: "Population" }
-  ],
-  "Person": [
-    { key: "born", label: "Born (YYYY-MM-DD)" },
-    { key: "occupation", label: "Occupation" },
-    { key: "knownFor", label: "Known for" }
-  ],
-  "College": [
-    { key: "established", label: "Established (YYYY)" },
-    { key: "affiliation", label: "Affiliation/University" },
-    { key: "location", label: "Location" }
-  ],
-  "School": [
-    { key: "established", label: "Established (YYYY)" },
-    { key: "board", label: "Board (e.g., JKBOSE, CBSE)" },
-    { key: "location", label: "Location" }
-  ],
-  "Mosque": [
-    { key: "location", label: "Location" },
-    { key: "established", label: "Established (YYYY)" }
-  ]
+// templates.js
+const TEMPLATES = {
+    'Villages': '{{Infobox\n|name = \n|district = \n|population = \n}}\n\n==History==\n\n==Geography==\n\n[[Link to related article]]',
+    'Districts': '{{Infobox\n|name = \n|capital = \n|area = \n}}\n\n==Overview==\n\n==Economy==\n',
+    'Famous People': '{{Infobox\n|name = \n|birth_date = \n|occupation = \n}}\n\n==Biography==\n\n==Achievements==\n',
+    'Colleges': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Courses==\n\n==Facilities==\n',
+    'Schools': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Curriculum==\n\n==Extracurricular==\n',
+    'Mosques': '{{Infobox\n|name = \n|built = \n|location = \n}}\n\n==Architecture==\n\n==History==\n'
 };
-
-// Default categories list for homepage chips
-const DEFAULT_CATEGORIES = Object.keys(ARTICLE_TEMPLATES);
