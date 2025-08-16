@@ -1,3 +1,5 @@
+
+<!-- submit.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,11 +20,15 @@
         <form id="submit-form">
             <label for="title">Title:</label>
             <input type="text" id="title" required>
-            <label for="category">Categories (hold Ctrl/Cmd to select multiple):</label>
-            <select id="category" multiple required>
-                <!-- Populated dynamically -->
+            <label for="category">Category:</label>
+            <select id="category" onchange="loadTemplate()">
+                <option value="Villages">Villages</option>
+                <option value="Districts">Districts</option>
+                <option value="Famous People">Famous People</option>
+                <option value="Colleges">Colleges</option>
+                <option value="Schools">Schools</option>
+                <option value="Mosques">Mosques</option>
             </select>
-            <div id="category-error" style="color: red; display: none;">Failed to load categories. Please refresh the page.</div>
             <label for="content">Content (Wiki-style):</label>
             <textarea id="content" rows="20" required></textarea>
             <button type="button" onclick="submitArticle()">Submit</button>
@@ -32,12 +38,11 @@
     <script src="templates.js"></script>
     <script src="app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
-            if (!localStorage.getItem('userId')) {
+            if (!localStorage.getItem('username')) {
                 window.location.href = 'login.html';
             }
-            await loadCategories();
             loadTemplate();
         });
     </script>
