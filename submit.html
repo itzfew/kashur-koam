@@ -28,7 +28,7 @@
             <label for="title">Title:</label>
             <input type="text" id="title" required>
             <label for="category">Category:</label>
-            <select id="category" onchange="loadTemplate()">
+            <select id="category" onchange="loadTemplateOptions()">
                 <option value="Villages">Villages</option>
                 <option value="Districts">Districts</option>
                 <option value="Famous People">Famous People</option>
@@ -36,8 +36,11 @@
                 <option value="Schools">Schools</option>
                 <option value="Mosques">Mosques</option>
             </select>
+            <label>Template Options:</label>
+            <div id="template-options"></div>
             <label for="content">Content (Wiki-style):</label>
             <textarea id="content" rows="20" required></textarea>
+            <button type="button" onclick="generateTemplate()">Generate Template</button>
             <button type="button" onclick="submitArticle()">Submit</button>
         </form>
     </main>
@@ -50,7 +53,7 @@
             if (!localStorage.getItem('username')) {
                 window.location.href = 'login.html';
             }
-            loadTemplate();
+            loadTemplateOptions();
         });
     </script>
 </body>
