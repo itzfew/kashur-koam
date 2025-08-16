@@ -9,6 +9,9 @@
     <meta name="keywords" content="Kashmir, submit article, encyclopedia, contribute">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/@tiptap/core@2.1.12/dist/tiptap.umd.min.js"></script>
+    <script src="https://unpkg.com/@tiptap/starter-kit@2.1.12/dist/starter-kit.umd.min.js"></script>
+    <script src="https://unpkg.com/@tiptap/extension-link@2.1.12/dist/link.umd.min.js"></script>
 </head>
 <body>
     <div id="loading" class="loading-spinner" style="display: none;">
@@ -35,7 +38,8 @@
                 <option value="Mosques">Mosques</option>
             </select>
             <label for="content">Content (Wiki-style):</label>
-            <textarea id="content" rows="20" required></textarea>
+            <div id="editor"></div>
+            <input type="hidden" id="content">
             <button type="button" onclick="submitArticle()">Submit</button>
         </form>
     </main>
@@ -48,6 +52,7 @@
             if (!localStorage.getItem('username')) {
                 window.location.href = 'login.html';
             }
+            initEditor('editor', 'content');
             loadTemplate();
         });
     </script>
