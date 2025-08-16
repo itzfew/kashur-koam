@@ -40,26 +40,32 @@ async function signup() {
 }
 
 async function loadCategories() {
-    const response = await fetch(`${SCRIPT_URL}?action=getCategories`);
-    const categories = await response.json();
-    const list = document.getElementById('category-list');
-    const select = document.getElementById('category');
-    if (list) {
-        list.innerHTML = '';
-        categories.forEach(category => {
-            const li = document.createElement('li');
-            li.innerHTML = `<a href="#" onclick="loadArticlesByCategory('${category.name}')">${category.name}</a>`;
-            list.appendChild(li);
-        });
-    }
-    if (select) {
-        select.innerHTML = '';
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.name;
-            option.textContent = category.name;
-            select.appendChild(option);
-        });
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getCategories`);
+        if (!response.ok) throw new Error('Failed to fetch categories');
+        const categories = await response.json();
+        const list = document.getElementById('category-list');
+        const select = document.getElementById('category');
+        if (list) {
+            list.innerHTML = '';
+            categories.forEach(category => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="#" onclick="loadArticlesByCategory('${category.name}')">${category.name}</a>`;
+                list.appendChild(li);
+            });
+        }
+        if (select) {
+            select.innerHTML = '';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                select.appendChild(option);
+            });
+        }
+    } catch (error) {
+        console.error('Error loading categories:', error);
+        alert('Failed to load categories. Please try again.');
     }
 }
 
@@ -170,6 +176,7 @@ async function submitArticle() {
     const contentText = document.getElementById('content').value;
     const authorId = localStorage.getItem('userId');
     if (!authorId) return alert('Login required');
+    if (categories.length === 0) return alert('Please select at least one category');
     const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${encodeURIComponent(title)}&categories=${encodeURIComponent(categories.join(','))}&contentText=${encodeURIComponent(contentText)}&authorId=${encodeURIComponent(authorId)}`);
     const data = await response.json();
     if (data.success) {
@@ -186,6 +193,7 @@ async function editArticle() {
     const contentText = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
     const editorId = localStorage.getItem('userId');
+    if (categories.length === 0) return alert('Please select at least one category');
     const response = await fetch(`${SCRIPT_URL}?action=editArticle&slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&categories=${encodeURIComponent(categories.join(','))}&contentText=${encodeURIComponent(contentText)}&summary=${encodeURIComponent(summary)}&editorId=${encodeURIComponent(editorId)}`);
     const data = await response.json();
     if (data.success) {
@@ -196,7 +204,8 @@ async function editArticle() {
 }
 
 function loadTemplate() {
-    const category = document.getElementById('category').value;
+    const select = document.getElementById('category');
+    const category = select && select.selectedOptions.length > 0 ? select.selectedOptions[0].value : 'Villages';
     const template = TEMPLATES[category] || '';
     document.getElementById('content').value = template;
 }
