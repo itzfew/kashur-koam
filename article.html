@@ -1,4 +1,5 @@
 
+
 <!-- article.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -6,22 +7,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kashurpedia - Article</title>
+    <meta name="description" content="Read detailed articles about Kashmir's culture, history, and landmarks on Kashurpedia.">
+    <meta name="keywords" content="Kashmir, articles, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
+    <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="loading" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
     <header>
         <h1>Kashurpedia</h1>
         <div id="user-profile">
             <a href="login.html">Login</a>
         </div>
-        <input type="text" id="search-bar" placeholder="Search articles...">
-        <button onclick="searchArticles()">Search</button>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search articles...">
+            <button onclick="searchArticles()">Search</button>
+        </div>
     </header>
     <main>
         <h2 id="article-title"></h2>
         <div id="infobox"></div>
         <div id="article-content"></div>
-        <a href="#" id="edit-link">Edit</a>
+        <a href="#" id="edit-link" class="edit-link">Edit</a>
         <section id="edit-history">
             <h3>Edit History</h3>
             <ul id="history-list"></ul>
@@ -29,7 +38,7 @@
         <section id="comments">
             <h3>Comments</h3>
             <ul id="comments-list"></ul>
-            <textarea id="new-comment"></textarea>
+            <textarea id="new-comment" placeholder="Add your comment..."></textarea>
             <button onclick="submitComment()">Add Comment</button>
         </section>
     </main>
