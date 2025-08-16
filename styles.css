@@ -236,10 +236,10 @@ main {
     background-color: #2ea44f;
 }
 
-.pre-content {
+.page-actions {
     margin: 0 1.5rem;
-    padding: 1.5rem 0 0;
-    position: relative;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--light-border);
 }
 
 .page-heading {
@@ -600,11 +600,6 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focu
     border-color: var(--primary-color);
     box-shadow: 0 0 5px rgba(26, 115, 232, 0.3);
 }
-.page-actions {
-    margin: 0 1.5rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid var(--light-border);
-} 
 
 textarea {
     min-height: 250px;
@@ -796,7 +791,7 @@ footer {
         width: 100%;
     }
 
-    .pre-content {
+    .page-actions {
         margin: 0 1rem;
     }
 
