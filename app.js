@@ -1,5 +1,3 @@
-
-
 // app.js
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
@@ -88,7 +86,17 @@ async function loadArticlesByCategory(category) {
     try {
         const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${category}`);
         const articles = await response.json();
-        alert(articles.map(a => a.title).join('\n'));
+        const list = document.getElementById('category-list');
+        if (list) {
+            list.innerHTML = '';
+            articles.forEach(article => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="article.html?id=${encodeURIComponent(article.id)}">${article.title}</a>`;
+                list.appendChild(li);
+            });
+        } else {
+            window.location.href = `category.html?category=${encodeURIComponent(category)}`;
+        }
     } catch (error) {
         alert('Error loading category articles: ' + error.message);
     } finally {
@@ -100,15 +108,25 @@ async function searchArticles() {
     showLoading();
     const query = document.getElementById('search-bar').value;
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${query}`);
+        const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${encodeURIComponent(query)}`);
         const articles = await response.json();
-        alert(articles.map(a => a.title).join('\n'));
+        const list = document.getElementById('results-list');
+        if (list) {
+            list.innerHTML = '';
+            articles.forEach(article => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="article.html?id=${encodeURIComponent(article.id)}">${article.title}</a>`;
+                list.appendChild(li);
+            });
+        } else {
+            window.location.href = `search.html?query=${encodeURIComponent(query)}`;
+        }
     } catch (error) {
         alert('Error searching articles: ' + error.message);
     } finally {
         hideLoading();
     }
-}
+} 
 
 function parseWikiText(content, idMap) {
     let html = content.trim();
