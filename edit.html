@@ -1,4 +1,3 @@
-<!-- edit.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,6 +18,10 @@
         <form id="edit-form">
             <label for="title">Title:</label>
             <input type="text" id="title" readonly>
+            <label for="category">Category:</label>
+            <select id="category" multiple>
+                <!-- Populated dynamically -->
+            </select>
             <label for="content">Content:</label>
             <textarea id="content" rows="20" required></textarea>
             <label for="summary">Edit Summary:</label>
@@ -34,14 +37,15 @@
     <script src="app.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title');
+        const slug = urlParams.get('slug');
         document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
-            if (!localStorage.getItem('username')) {
+            if (!localStorage.getItem('userId')) {
                 window.location.href = 'login.html';
             }
-            loadArticleForEdit(title);
-            loadEditHistory(title);
+            loadCategories();
+            loadArticleForEdit(slug);
+            loadEditHistory(slug);
         });
     </script>
 </body>
