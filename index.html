@@ -9,6 +9,7 @@
     <meta name="keywords" content="Kashmir, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
     <meta name="robots" content="index, follow">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Linux+Libertine&display=swap">
 </head>
 <body>
     <div id="loading" class="loading-spinner" style="display: none;">
@@ -16,12 +17,12 @@
     </div>
     <header>
         <h1>Kashurpedia</h1>
-        <div id="user-profile">
-            <a href="login.html">Login</a>
-        </div>
         <div class="search-container">
             <input type="text" id="search-bar" placeholder="Search articles...">
             <button onclick="searchArticles()">Search</button>
+        </div>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
         </div>
     </header>
     <main>
@@ -39,8 +40,8 @@
         <section id="latest-articles">
             <h2>Latest Articles</h2>
             <ul id="latest-list"></ul>
+            <a href="submit.html" class="submit-link">Submit New Article</a>
         </section>
-        <a href="submit.html" class="submit-link">Submit New Article</a>
     </main>
     <script src="config.js"></script>
     <script src="app.js"></script>
