@@ -1,3 +1,5 @@
+
+
 /* styles.css */
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -80,63 +82,109 @@ main {
 
 .article-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 20px;
 }
 
-#infobox {
-    flex: 0 0 250px;
+.infobox {
+    float: right;
     border: 1px solid #ddd;
     padding: 15px;
+    margin: 0 0 20px 20px;
+    width: 250px;
     background: #f4f4f4;
     border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-#infobox table {
+.infobox table {
     width: 100%;
+    border-collapse: collapse;
 }
 
-#infobox th {
+.infobox th {
     font-weight: bold;
     text-align: left;
-    padding: 5px;
+    padding: 8px;
     background: #e9ecef;
+    border-bottom: 1px solid #ddd;
 }
 
-#infobox td {
-    padding: 5px;
+.infobox td {
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
 }
 
-#article-content {
-    flex: 1;
-    min-width: 300px;
+.article-content {
+    line-height: 1.6;
+    font-size: 16px;
 }
 
-#article-content a {
+.article-content h3 {
+    color: #007bff;
+    margin-top: 20px;
+}
+
+.article-content p {
+    margin: 10px 0;
+}
+
+.article-content a {
     color: #007bff;
     text-decoration: none;
 }
 
-#article-content a:hover {
+.article-content a:hover {
     text-decoration: underline;
 }
 
-#citations ul {
+.article-actions {
+    margin: 20px 0;
+}
+
+.submit-link, .edit-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.submit-link:hover, .edit-link:hover {
+    background: #218838;
+}
+
+#citations, #edit-history, #comments {
+    margin-top: 20px;
+}
+
+#citations-list, #history-list, #comments-list {
     list-style: none;
     padding: 0;
 }
 
-#citations li {
-    margin-bottom: 10px;
+#citations-list li, #history-list li, #comments-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
-#citations a {
+#citations-list li a {
     color: #007bff;
     text-decoration: none;
 }
 
-#citations a:hover {
+#citations-list li a:hover {
     text-decoration: underline;
+}
+
+#new-comment {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
 }
 
 form {
@@ -162,23 +210,6 @@ textarea {
     resize: vertical;
 }
 
-#editor {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 10px;
-    min-height: 300px;
-}
-
-#editor .ProseMirror {
-    min-height: 300px;
-    border: none;
-    outline: none;
-}
-
-#editor .ProseMirror p {
-    margin: 0 0 10px;
-}
-
 #categories ul {
     list-style: none;
     padding: 0;
@@ -200,20 +231,6 @@ textarea {
 
 #categories a:hover {
     text-decoration: underline;
-}
-
-.submit-link, .edit-link {
-    display: inline-block;
-    margin: 20px 0;
-    padding: 10px 20px;
-    background: #28a745;
-    color: white;
-    text-decoration: none;
-    border-radius: 4px;
-}
-
-.submit-link:hover, .edit-link:hover {
-    background: #218838;
 }
 
 .loading-spinner {
