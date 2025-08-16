@@ -71,15 +71,25 @@ main {
     padding: 0 20px;
 }
 
-#infobox {
-    float: right;
-    border: 1px solid #ddd;
-    padding: 15px;
-    margin: 0 0 20px 20px;
-    width: 250px;
+.article-main {
     background: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.article-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+#infobox {
+    flex: 0 0 250px;
+    border: 1px solid #ddd;
+    padding: 15px;
+    background: #f4f4f4;
+    border-radius: 8px;
 }
 
 #infobox table {
@@ -90,11 +100,16 @@ main {
     font-weight: bold;
     text-align: left;
     padding: 5px;
-    background: #f4f4f4;
+    background: #e9ecef;
 }
 
 #infobox td {
     padding: 5px;
+}
+
+#article-content {
+    flex: 1;
+    min-width: 300px;
 }
 
 #article-content a {
@@ -103,6 +118,24 @@ main {
 }
 
 #article-content a:hover {
+    text-decoration: underline;
+}
+
+#citations ul {
+    list-style: none;
+    padding: 0;
+}
+
+#citations li {
+    margin-bottom: 10px;
+}
+
+#citations a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+#citations a:hover {
     text-decoration: underline;
 }
 
@@ -127,6 +160,23 @@ input, textarea, select {
 
 textarea {
     resize: vertical;
+}
+
+#editor {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    min-height: 300px;
+}
+
+#editor .ProseMirror {
+    min-height: 300px;
+    border: none;
+    outline: none;
+}
+
+#editor .ProseMirror p {
+    margin: 0 0 10px;
 }
 
 #categories ul {
