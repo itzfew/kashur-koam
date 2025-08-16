@@ -120,9 +120,16 @@ main {
     font-size: 16px;
 }
 
-.article-content h3 {
+.article-content h2 {
     color: #007bff;
     margin-top: 20px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 5px;
+}
+
+.article-content h3 {
+    color: #0056b3;
+    margin-top: 15px;
 }
 
 .article-content p {
@@ -136,6 +143,25 @@ main {
 
 .article-content a:hover {
     text-decoration: underline;
+}
+
+.article-content strong {
+    font-weight: bold;
+}
+
+.article-content em {
+    font-style: italic;
+}
+
+.article-content ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 10px 0;
+}
+
+.article-content sup {
+    font-size: 0.8em;
+    color: #007bff;
 }
 
 .article-actions {
