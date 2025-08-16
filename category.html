@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Kashurpedia - Category</title>
+    <meta name="description" content="Browse articles by category on Kashurpedia, covering Kashmir's villages, districts, famous people, colleges, schools, and mosques.">
+    <meta name="keywords" content="Kashmir, category, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Linux+Libertine&display=swap">
+</head>
+<body>
+    <div id="loading" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <header>
+        <h1><a href="index.html" class="logo">Kashurpedia</a></h1>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search articles...">
+            <button onclick="searchArticles()">Search</button>
+        </div>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <main>
+        <section id="category-articles">
+            <h2>Category: <span id="category-name"></span></h2>
+            <ul id="category-list"></ul>
+            <a href="submit.html" class="submit-link">Submit New Article</a>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Kashurpedia. All rights reserved.</p>
+    </footer>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            document.getElementById('category-name').textContent = category || '';
+            document.getElementById('page-title').textContent = `Kashurpedia - Category: ${category}`;
+            loadArticlesByCategory(category);
+        });
+    </script>
+</body>
+</html>
