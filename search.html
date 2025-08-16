@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Search Results</title>
+    <meta name="description" content="Search results for articles on Kashurpedia about Kashmir's culture, history, and landmarks.">
+    <meta name="keywords" content="Kashmir, search, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Linux+Libertine&display=swap">
+</head>
+<body>
+    <div id="loading" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <header>
+        <h1><a href="index.html" class="logo">Kashurpedia</a></h1>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search articles...">
+            <button onclick="searchArticles()">Search</button>
+        </div>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <main>
+        <section id="search-results">
+            <h2>Search Results for "<span id="search-query"></span>"</h2>
+            <ul id="results-list"></ul>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 Kashurpedia. All rights reserved.</p>
+    </footer>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('query');
+            document.getElementById('search-query').textContent = query || '';
+            if (query) {
+                document.getElementById('search-bar').value = query;
+                searchArticles();
+            }
+        });
+    </script>
+</body>
+</html>
