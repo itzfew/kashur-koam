@@ -1,47 +1,46 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kashurpedia</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <script defer src="config.js"></script>
-  <script defer src="templates.js"></script>
-  <script defer src="app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Home</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <div class="container nav">
-    <div class="left">
-      <a class="logo" href="index.html">Kashurpedia</a>
-      <div class="search">
-        <input id="searchInput" type="search" placeholder="Search articles, people, places..." />
-      </div>
-      <a class="btn secondary" href="submit.html">New Article</a>
-    </div>
-    <div class="user" id="userBox">
-      <!-- login/profile injected -->
-    </div>
-  </div>
-</header>
-
-<main class="container" style="padding:18px 0 36px;">
-  <section>
-    <h2>Categories</h2>
-    <div id="catChips" class="chips"></div>
-  </section>
-
-  <section style="margin-top:24px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <h2>Latest Articles</h2>
-      <a href="#" id="seeAll" class="subtle">See all →</a>
-    </div>
-    <div class="grid cards" id="articleGrid"></div>
-  </section>
-</main>
-
-<footer>
-  Kashurpedia • an open community knowledge base
-</footer>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+        <input type="text" id="search-bar" placeholder="Search articles...">
+        <button onclick="searchArticles()">Search</button>
+    </header>
+    <main>
+        <section id="categories">
+            <h2>Categories</h2>
+            <ul>
+                <li><a href="#" onclick="loadArticlesByCategory('Villages')">Villages</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Districts')">Districts</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Famous People')">Famous People</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Colleges')">Colleges</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Schools')">Schools</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Mosques')">Mosques</a></li>
+            </ul>
+        </section>
+        <section id="latest-articles">
+            <h2>Latest Articles</h2>
+            <ul id="latest-list"></ul>
+        </section>
+        <a href="submit.html">Submit New Article</a>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            loadLatestArticles();
+        });
+    </script>
 </body>
 </html>
