@@ -1,5 +1,3 @@
-
-
 <!-- edit.html -->
 <!DOCTYPE html>
 <html lang="en">
@@ -52,14 +50,14 @@
     <script src="app.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title');
+        const id = urlParams.get('id');
         document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
             if (!localStorage.getItem('username')) {
                 window.location.href = 'login.html';
             }
-            loadArticleForEdit(title);
-            loadEditHistory(title);
+            loadArticleForEdit(id);
+            loadEditHistory(id);
         });
     </script>
 </body>
