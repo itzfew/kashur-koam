@@ -17,6 +17,57 @@ function checkLogin() {
     }
 }
 
+function initEditor(editorId, contentId) {
+    const editor = new Tiptap.Editor({
+        element: document.getElementById(editorId),
+        extensions: [
+            Tiptap.StarterKit,
+            Tiptap.Link.configure({
+                openOnClick: false,
+            }),
+            {
+                name: 'citation',
+                addCommands() {
+                    return {
+                        addCitation: (attributes) => ({ chain }) => {
+                            return chain()
+                                .insertContent(`<sup><a href="${attributes.url}" class="citation">[${attributes.number}]</a></sup>`)
+                                .run();
+                        },
+                    };
+                },
+            },
+        ],
+        content: '',
+        onUpdate: ({ editor }) => {
+            document.getElementById(contentId).value = editor.getHTML();
+        },
+    });
+
+    // Add toolbar
+    const toolbar = document.createElement('div');
+    toolbar.className = 'editor-toolbar';
+    toolbar.innerHTML = `
+        <button onclick="editor.chain().focus().toggleBold().run()">Bold</button>
+        <button onclick="editor.chain().focus().toggleItalic().run()">Italic</button>
+        <button onclick="editor.chain().focus().toggleHeading({ level: 2 }).run()">Heading</button>
+        <button onclick="promptCitation()">Add Citation</button>
+        <button onclick="editor.chain().focus().setLink({ href: prompt('Enter URL') }).run()">Add Link</button>
+    `;
+    document.getElementById(editorId).prepend(toolbar);
+
+    window.editor = editor;
+
+    // Citation prompt
+    window.promptCitation = function() {
+        const url = prompt('Enter citation URL');
+        const number = prompt('Enter citation number');
+        if (url && number) {
+            editor.chain().focus().addCitation({ url, number }).run();
+        }
+    };
+}
+
 async function login() {
     showLoading();
     const username = document.getElementById('username').value;
@@ -117,14 +168,34 @@ async function loadArticle(id) {
             throw new Error('Article not found');
         }
         document.getElementById('article-title').textContent = article.title;
-        const content = article.content.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
+        let content = article.content;
+        // Auto-link article titles
+        Object.keys(article.idMap).forEach(title => {
+            const regex = new RegExp(`\\b${title}\\b(?!\\]\\])`, 'g');
+            content = content.replace(regex, `<a href="article.html?id=${encodeURIComponent(article.idMap[title])}">${title}</a>`);
+        });
+        // Handle wiki-style links
+        content = content.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
             return `<a href="article.html?id=${encodeURIComponent(article.idMap[title] || '')}">${title}</a>`;
         });
         const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
         if (infoboxMatch) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
+            content = content.replace(/{{Infobox(.*?)}}/s, '');
         }
-        document.getElementById('article-content').innerHTML = content.replace(/{{Infobox(.*?)}}/s, '');
+        document.getElementById('article-content').innerHTML = content;
+        // Load citations
+        const citationsList = document.getElementById('citations-list');
+        citationsList.innerHTML = '';
+        if (article.citations && article.citations.length) {
+            article.citations.forEach(citation => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${citation.url}" class="citation">[${citation.number}]</a> ${citation.description}`;
+                citationsList.appendChild(li);
+            });
+        } else {
+            document.getElementById('citations').style.display = 'none';
+        }
     } catch (error) {
         alert('Error loading article: ' + error.message);
     } finally {
@@ -152,8 +223,9 @@ async function loadArticleForEdit(id) {
             throw new Error('Article not found');
         }
         document.getElementById('title').value = article.title;
-        document.getElementById('content').value = article.content;
         document.getElementById('category').value = article.category;
+        window.editor.setContent(article.content);
+        document.getElementById('content').value = article.content;
     } catch (error) {
         alert('Error loading article for edit: ' + error.message);
     } finally {
@@ -249,7 +321,6 @@ async function submitArticle() {
 async function editArticle() {
     showLoading();
     const id = new URLSearchParams(window.location.search).get('id');
-    const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
     const category = document.getElementById('category').value;
@@ -274,6 +345,7 @@ function loadTemplate() {
     const template = TEMPLATES[category] || '';
     const content = document.getElementById('content');
     if (!content.value || confirm('Load template? This will overwrite current content.')) {
+        window.editor.setContent(template);
         content.value = template;
     }
 }
