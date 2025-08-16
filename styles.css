@@ -123,13 +123,15 @@ main {
 .article-content h2 {
     color: #007bff;
     margin-top: 20px;
-    border-bottom: 2px solid #e9ecef;
+    border-bottom: 2px solid #007bff;
     padding-bottom: 5px;
+    font-size: 24px;
 }
 
 .article-content h3 {
     color: #0056b3;
     margin-top: 15px;
+    font-size: 20px;
 }
 
 .article-content p {
@@ -162,6 +164,11 @@ main {
 .article-content sup {
     font-size: 0.8em;
     color: #007bff;
+    cursor: pointer;
+}
+
+.article-content sup:hover {
+    text-decoration: underline;
 }
 
 .article-actions {
@@ -183,6 +190,12 @@ main {
 
 #citations, #edit-history, #comments {
     margin-top: 20px;
+}
+
+#citations h3, #edit-history h3, #comments h3 {
+    color: #007bff;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 5px;
 }
 
 #citations-list, #history-list, #comments-list {
