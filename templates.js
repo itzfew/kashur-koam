@@ -1,9 +1,10 @@
+
 // templates.js
 const TEMPLATES = {
-    'Villages': '<div>{{Infobox<br>|name = <br>|district = <br>|population = <br>}}</div><h2>History</h2><p></p><h2>Geography</h2><p></p><p><a href="#">Link to related article</a></p>',
-    'Districts': '<div>{{Infobox<br>|name = <br>|capital = <br>|area = <br>}}</div><h2>Overview</h2><p></p><h2>Economy</h2><p></p>',
-    'Famous People': '<div>{{Infobox<br>|name = <br>|birth_date = <br>|occupation = <br>}}</div><h2>Biography</h2><p></p><h2>Achievements</h2><p></p>',
-    'Colleges': '<div>{{Infobox<br>|name = <br>|established = <br>|location = <br>}}</div><h2>Courses</h2><p></p><h2>Facilities</h2><p></p>',
-    'Schools': '<div>{{Infobox<br>|name = <br>|established = <br>|location = <br>}}</div><h2>Curriculum</h2><p></p><h2>Extracurricular</h2><p></p>',
-    'Mosques': '<div>{{Infobox<br>|name = <br>|built = <br>|location = <br>}}</div><h2>Architecture</h2><p></p><h2>History</h2><p></p>'
+    'Villages': '{{Infobox\n|name = \n|district = \n|population = \n}}\n\n==History==\n\n==Geography==\n\n[[Link to related article]]\n\n==References==\n{{Cite|title=|author=|url=|date=}}',
+    'Districts': '{{Infobox\n|name = \n|capital = \n|area = \n}}\n\n==Overview==\n\n==Economy==\n\n==References==\n{{Cite|title=|author=|url=|date=}}',
+    'Famous People': '{{Infobox\n|name = \n|birth_date = \n|occupation = \n}}\n\n==Biography==\n\n==Achievements==\n\n==References==\n{{Cite|title=|author=|url=|date=}}',
+    'Colleges': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Courses==\n\n==Facilities==\n\n==References==\n{{Cite|title=|author=|url=|date=}}',
+    'Schools': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Curriculum==\n\n==Extracurricular==\n\n==References==\n{{Cite|title=|author=|url=|date=}}',
+    'Mosques': '{{Infobox\n|name = \n|built = \n|location = \n}}\n\n==Architecture==\n\n==History==\n\n==References==\n{{Cite|title=|author=|url=|date=}}'
 };
