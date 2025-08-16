@@ -1,4 +1,3 @@
-<!-- article.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +19,7 @@
         <h2 id="article-title"></h2>
         <div id="infobox"></div>
         <div id="article-content"></div>
+        <p>Categories: <span id="article-categories"></span></p>
         <a href="#" id="edit-link">Edit</a>
         <section id="edit-history">
             <h3>Edit History</h3>
@@ -36,13 +36,13 @@
     <script src="app.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const title = urlParams.get('title');
+        const slug = urlParams.get('slug');
         document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
-            loadArticle(title);
-            loadEditHistory(title);
-            loadComments(title);
-            document.getElementById('edit-link').href = `edit.html?title=${encodeURIComponent(title)}`;
+            loadArticle(slug);
+            loadEditHistory(slug);
+            loadComments(slug);
+            document.getElementById('edit-link').href = `edit.html?slug=${encodeURIComponent(slug)}`;
         });
     </script>
 </body>
