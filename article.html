@@ -64,15 +64,7 @@
             <div class="mw-content-ltr mw-parser-output" dir="ltr" lang="en">
                 <section class="mf-section-0" id="mf-section-0">
                     <table id="infobox" class="infobox ib-settlement vcard"></table>
-                    <div id="article-content">
-                        <!-- Sample collapsible section -->
-                        <h2 class="mw-heading collapsible-heading">
-                            <span class="mf-icon"></span>Sample Section
-                        </h2>
-                        <div class="open-block" style="display: none;">
-                            <p>This is a sample collapsible section content.</p>
-                        </div>
-                    </div>
+                    <div id="article-content"></div>
                 </section>
             </div>
         </div>
@@ -96,16 +88,12 @@
                 header.addEventListener('click', () => {
                     const section = header.nextElementSibling;
                     const icon = header.querySelector('.mf-icon');
-                    if (section && icon) { // Null check for section and icon
-                        if (section.classList.contains('open-block')) {
-                            section.classList.remove('open-block');
-                            section.style.display = 'none';
-                            icon.style.transform = 'scaleY(1)';
-                        } else {
-                            section.classList.add('open-block');
-                            section.style.display = 'block';
-                            icon.style.transform = 'scaleY(-1)';
-                        }
+                    if (section.classList.contains('open-block')) {
+                        section.classList.remove('open-block');
+                        icon.style.transform = 'scaleY(1)';
+                    } else {
+                        section.classList.add('open-block');
+                        icon.style.transform = 'scaleY(-1)';
                     }
                 });
             });
