@@ -24,11 +24,9 @@
             <a href="login.html">Login</a>
         </div>
     </header>
-    <div class="pre-content heading-holder">
-        <div class="page-heading">
-            <h1 class="firstHeading" id="article-title"></h1>
-            <div id="short-description" class="tagline"></div>
-        </div>
+
+    <!-- TOP: Tabs + Actions -->
+    <div class="page-actions-top">
         <ul class="minerva__tab-container" id="p-associated-pages">
             <li class="minerva__tab selected mw-list-item"><a class="minerva__tab-text" href="#">Article</a></li>
             <li class="minerva__tab mw-list-item"><a class="minerva__tab-text" href="#" id="talk-link" rel="discussion">Talk</a></li>
@@ -38,43 +36,59 @@
                 <li class="page-actions-menu__list-item" id="language-selector">
                     <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet language-selector" href="#" title="Language">
                         <span class="minerva-icon minerva-icon--language"></span>
-                        <span style="border: 0; clip: rect(1px, 1px, 1px, 1px); display: block; height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute !important; width: 1px;">Language</span>
+                        <span class="visually-hidden">Language</span>
                     </a>
                 </li>
                 <li class="page-actions-menu__list-item" id="page-actions-edit">
                     <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet edit-page menu__item--page-actions-edit" href="#" id="edit-link" role="button" title="Edit">
                         <span class="minerva-icon minerva-icon--edit"></span>
-                        <span style="border: 0; clip: rect(1px, 1px, 1px, 1px); display: block; height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute !important; width: 1px;">Edit</span>
+                        <span class="visually-hidden">Edit</span>
                     </a>
                 </li>
             </ul>
         </nav>
+    </div>
+
+    <!-- Citation Notice -->
+    <div class="citation-wrapper">
+        <table id="citation-notice" class="box-More_citations_needed plainlinks metadata ambox ambox-content ambox-Refimprove" role="presentation" style="display: none;">
+            <tbody>
+                <tr>
+                    <td class="mbox-text">
+                        <span class="ambox-learn-more">Learn more</span>
+                        <div class="minerva-ambox-icon"></div>
+                        <div class="mbox-text-span">This article <span style="font-weight: inherit;">needs additional citations for <a href="#">verification</a></span>. <span class="date-container"><i>(<span class="date">August 2025</span>)</i></span></div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Heading + Description -->
+    <div class="pre-content heading-holder">
+        <div class="page-heading">
+            <h1 class="firstHeading" id="article-title"></h1>
+            <div id="short-description" class="tagline"></div>
+        </div>
         <div id="mw-content-subtitle"></div>
     </div>
+
+    <!-- Main Article Content -->
     <div class="content" id="bodyContent">
         <div class="mw-body-content" id="mw-content-text">
             <div class="mw-content-ltr mw-parser-output" dir="ltr" lang="en">
                 <section class="mf-section-0" id="mf-section-0">
-                    <table id="citation-notice" class="box-More_citations_needed plainlinks metadata ambox ambox-content ambox-Refimprove" role="presentation" style="display: none;">
-                        <tbody>
-                            <tr>
-                                <td class="mbox-text">
-                                    <span class="ambox-learn-more">Learn more</span>
-                                    <div class="minerva-ambox-icon"></div>
-                                    <div class="mbox-text-span">This article <span style="font-weight: inherit;">needs additional citations for <a href="#">verification</a></span>. <span class="date-container"><i>(<span class="date">August 2025</span>)</i></span></div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
                     <table id="infobox" class="infobox ib-settlement vcard"></table>
                     <div id="article-content"></div>
                 </section>
             </div>
         </div>
     </div>
+
     <footer>
         <p>&copy; 2025 Kashurpedia. All rights reserved.</p>
     </footer>
+
     <script src="config.js"></script>
     <script src="app.js"></script>
     <script>
