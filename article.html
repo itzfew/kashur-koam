@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Article • Kashurpedia</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="config.js"></script>
+  <script defer src="templates.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="left">
+      <a class="logo" href="index.html">Kashurpedia</a>
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Search articles..." />
+      </div>
+    </div>
+    <div class="user" id="userBox"></div>
+  </div>
+</header>
+
+<main class="container" style="padding:18px 0 36px;">
+  <div id="articleContainer" class="article"></div>
+
+  <h3 class="section-title">Edit history</h3>
+  <table class="table" id="revTable">
+    <thead><tr><th>Date</th><th>Editor</th><th>Summary</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <h3 class="section-title">Comments</h3>
+  <div id="commentList"></div>
+  <div id="commentBox" style="margin-top:12px;"></div>
+</main>
+
+<footer>© Kashurpedia</footer>
+</body>
+</html>

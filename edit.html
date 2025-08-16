@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Article • Kashurpedia</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="config.js"></script>
+  <script defer src="templates.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a class="logo" href="index.html">Kashurpedia</a>
+    <div class="user" id="userBox"></div>
+  </div>
+</header>
+
+<main class="container" style="padding:18px 0 36px;">
+  <h2>Edit article</h2>
+  <form id="editForm" class="form">
+    <input type="hidden" name="id"/>
+    <label>Title<input class="input" name="title" required /></label>
+    <label>Type
+      <select class="input" name="type" id="typeSelect" required></select>
+    </label>
+    <div id="templateFields"></div>
+    <label>Body<textarea name="body" required></textarea></label>
+    <label>Edit summary<input class="input" name="summary" placeholder="What did you change?"/></label>
+    <label>Tags/Categories<input class="input" name="categories"/></label>
+    <button class="btn" type="submit">Save changes</button>
+  </form>
+</main>
+</body>
+</html>

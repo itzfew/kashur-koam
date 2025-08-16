@@ -1,150 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="google-site-verification" content="X1yoYg1Z5smKRnxyWem9N2jsbTljpLu1WClAcN3kB6I" />
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Kashur Koam - Discover educational posts, districts, villages, and schools. Explore the latest and most detailed content about education.">
-    <meta name="keywords" content="education, schools, villages, districts, learning, Kashur Koam">
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="Kashur Koam Team">
-    <title>Kashur Koam</title>
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kashurpedia</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="config.js"></script>
+  <script defer src="templates.js"></script>
+  <script defer src="app.js"></script>
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <h1><a href="/">Kashur Koam</a></h1>
-            <nav>
-                <a href="/">Home</a>
-                <a href="/pages/contact.html">Contact</a>
-                <a href="/pages/privacy-policy.html">Privacy Policy</a>
-                <a href="/pages/terms-and-conditions.html">Terms</a>
-            </nav>
-        </div>
-    </header>
+<header>
+  <div class="container nav">
+    <div class="left">
+      <a class="logo" href="index.html">Kashurpedia</a>
+      <div class="search">
+        <input id="searchInput" type="search" placeholder="Search articles, people, places..." />
+      </div>
+      <a class="btn secondary" href="submit.html">New Article</a>
+    </div>
+    <div class="user" id="userBox">
+      <!-- login/profile injected -->
+    </div>
+  </div>
+</header>
 
-    <main>
-        <section id="hero">
-            
-            <div class="search-container">
-                <div class="search-wrapper">
-                    <input type="text" id="search-bar" placeholder="Search posts, districts, or schools...">
-                    <i class="fas fa-search search-icon"></i>
-                </div>
-                <a href="/pages/article.html" class="add-article-btn">Add Article</a>
-            </div>
-        </section>
+<main class="container" style="padding:18px 0 36px;">
+  <section>
+    <h2>Categories</h2>
+    <div id="catChips" class="chips"></div>
+  </section>
 
-        <section id="recent-posts">
-            <h2>Recent Posts</h2>
-            <div class="posts-container" id="recent-posts-container"></div>
-        </section>
+  <section style="margin-top:24px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <h2>Latest Articles</h2>
+      <a href="#" id="seeAll" class="subtle">See all →</a>
+    </div>
+    <div class="grid cards" id="articleGrid"></div>
+  </section>
+</main>
 
-        <section id="lengthy-posts">
-            <h2>Most Detailed Posts</h2>
-            <div class="posts-container" id="lengthy-posts-container"></div>
-        </section>
-
-        <section id="districts">
-            <h2>Explore Districts</h2>
-            <div class="districts-grid" id="districts-container"></div>
-        </section>
-
-        <section id="schools">
-            <h2>Schools by District</h2>
-            <div class="schools-list" id="schools-container"></div>
-        </section>
-
-        <section id="recommended-posts">
-            <h2>Recommended for You</h2>
-            <div class="posts-container" id="recommended-container"></div>
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 Kashur Koam. All rights reserved.</p>
-    </footer>
-
-    <script src="/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', async () => {
-            const posts = await fetchAllPosts();
-
-            // Display Recent Posts (4 most recent)
-            const recentPosts = posts.slice(0, 4);
-            document.getElementById('recent-posts-container').innerHTML = recentPosts.length ?
-                recentPosts.map(post => createPostCard(post)).join('') :
-                '<p>No recent posts found.</p>';
-
-            // Display Most Lengthy Posts (3 longest by content length)
-            const lengthyPosts = posts
-                .sort((a, b) => b.content.length - a.content.length)
-                .slice(0, 3);
-            document.getElementById('lengthy-posts-container').innerHTML = lengthyPosts.length ?
-                lengthyPosts.map(post => createPostCard(post)).join('') :
-                '<p>No detailed posts found.</p>';
-
-            // Display Districts Grid
-            const districts = [...new Set(posts
-                .filter(post => post.district)
-                .map(post => post.district))];
-            document.getElementById('districts-container').innerHTML = districts.length ?
-                districts.map(district => `
-                    <a href="/pages/search.html?label=${encodeURIComponent(district)}" class="district-card">
-                        ${district}
-                    </a>
-                `).join('') :
-                '<p>No districts found.</p>';
-
-            // Display Schools by District
-            const schoolsByDistrict = {};
-            posts.filter(post => post.type === 'school').forEach(post => {
-                if (!schoolsByDistrict[post.district]) {
-                    schoolsByDistrict[post.district] = [];
-                }
-                schoolsByDistrict[post.district].push(post);
-            });
-
-            document.getElementById('schools-container').innerHTML = Object.keys(schoolsByDistrict).length ?
-                Object.keys(schoolsByDistrict).map(district => `
-                    <div class="district-schools">
-                        <h3><a href="/pages/search.html?label=school_${encodeURIComponent(district)}">${district}</a></h3>
-                        <div class="posts-container">
-                            ${schoolsByDistrict[district].map(post => createPostCard(post)).join('')}
-                        </div>
-                    </div>
-                `).join('') :
-                '<p>No schools found.</p>';
-
-            // Display Recommended Posts (3 posts with similar tags or type)
-            const recommendedPosts = posts
-                .sort((a, b) => {
-                    const aTagMatches = a.tags ? a.tags.filter(tag => posts[0].tags.includes(tag)).length : 0;
-                    const bTagMatches = b.tags ? b.tags.filter(tag => posts[0].tags.includes(tag)).length : 0;
-                    return bTagMatches - aTagMatches || new Date(b.date) - new Date(a.date);
-                })
-                .slice(0, 3);
-            document.getElementById('recommended-container').innerHTML = recommendedPosts.length ?
-                recommendedPosts.map(post => createPostCard(post)).join('') :
-                '<p>No recommended posts found.</p>';
-
-            // Trigger search on Enter key press
-            document.getElementById('search-bar').addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    searchContent();
-                }
-            });
-        });
-
-        function searchContent() {
-            const query = document.getElementById('search-bar').value.trim();
-            if (query) {
-                window.location.href = `/pages/search.html?query=${encodeURIComponent(query)}`;
-            }
-        }
-    </script>
+<footer>
+  Kashurpedia • an open community knowledge base
+</footer>
 </body>
 </html>

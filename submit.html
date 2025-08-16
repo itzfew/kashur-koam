@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Submit Article • Kashurpedia</title>
+  <link rel="stylesheet" href="styles.css"/>
+  <script defer src="config.js"></script>
+  <script defer src="templates.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <a class="logo" href="index.html">Kashurpedia</a>
+    <div class="user" id="userBox"></div>
+  </div>
+</header>
+
+<main class="container" style="padding:18px 0 36px;">
+  <h2>Create a new article</h2>
+  <form id="createForm" class="form">
+    <label>Title<input class="input" name="title" required /></label>
+
+    <label>Category (type)
+      <select class="input" name="type" id="typeSelect" required></select>
+    </label>
+
+    <div id="templateFields"></div>
+
+    <label>Body (supports [[Wiki Links]])
+      <textarea name="body" placeholder="Write the main content..." required></textarea>
+    </label>
+
+    <label>Tags/Categories (comma separated)
+      <input class="input" name="categories" placeholder="e.g. Village, Baramulla"/>
+    </label>
+
+    <button class="btn" type="submit">Publish</button>
+  </form>
+</main>
+
+</body>
+</html>
