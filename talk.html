@@ -1,0 +1,76 @@
+
+
+<!-- talk.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Kashurpedia - Talk</title>
+    <meta name="description" content="Discuss articles on Kashurpedia to contribute to Kashmir's knowledge base.">
+    <meta name="keywords" content="Kashmir, talk, discussion, encyclopedia">
+    <meta name="robots" content="index, follow">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&family=Linux+Libertine&display=swap">
+</head>
+<body>
+    <div id="loading" class="loading-spinner" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div class="search-container">
+            <input type="text" id="search-bar" placeholder="Search articles...">
+            <button onclick="searchArticles()">Search</button>
+        </div>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <div class="pre-content heading-holder">
+        <div class="page-heading">
+            <h1 class="firstHeading" id="article-title"></h1>
+            <div id="short-description" class="tagline"></div>
+        </div>
+        <ul class="minerva__tab-container" id="p-associated-pages">
+            <li class="minerva__tab mw-list-item"><a class="minerva__tab-text" href="#" id="article-link">Article</a></li>
+            <li class="minerva__tab selected mw-list-item"><a class="minerva__tab-text" href="#" rel="discussion">Talk</a></li>
+        </ul>
+        <nav class="page-actions-menu">
+            <ul class="page-actions-menu__list minerva-icon-only-menu" id="p-views">
+                <li class="page-actions-menu__list-item" id="language-selector">
+                    <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet language-selector" href="#" title="Language">
+                        <span class="minerva-icon minerva-icon--language"></span>
+                        <span style="border: 0; clip: rect(1px, 1px, 1px, 1px); display: block; height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute !important; width: 1px;">Language</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <div class="content" id="bodyContent">
+        <div class="mw-body-content" id="mw-content-text">
+            <div class="mw-content-ltr mw-parser-output" dir="ltr" lang="en">
+                <section class="mf-section-0" id="mf-section-0">
+                    <div id="comments" style="display: none;">
+                        <h2>Discussion</h2>
+                        <ul id="comments-list"></ul>
+                        <textarea id="new-comment" placeholder="Add your comment..."></textarea>
+                        <button onclick="submitComment()">Add Comment</button>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            document.getElementById('article-link').href = `article.html?id=${encodeURIComponent(id)}`;
+            loadTalk(id);
+        });
+    </script>
+</body>
+</html>
