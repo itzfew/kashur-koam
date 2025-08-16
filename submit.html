@@ -1,4 +1,3 @@
-<!-- submit.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,13 +19,8 @@
             <label for="title">Title:</label>
             <input type="text" id="title" required>
             <label for="category">Category:</label>
-            <select id="category" onchange="loadTemplate()">
-                <option value="Villages">Villages</option>
-                <option value="Districts">Districts</option>
-                <option value="Famous People">Famous People</option>
-                <option value="Colleges">Colleges</option>
-                <option value="Schools">Schools</option>
-                <option value="Mosques">Mosques</option>
+            <select id="category" multiple onchange="loadTemplate()">
+                <!-- Populated dynamically -->
             </select>
             <label for="content">Content (Wiki-style):</label>
             <textarea id="content" rows="20" required></textarea>
@@ -39,9 +33,10 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             checkLogin();
-            if (!localStorage.getItem('username')) {
+            if (!localStorage.getItem('userId')) {
                 window.location.href = 'login.html';
             }
+            loadCategories();
             loadTemplate();
         });
     </script>
