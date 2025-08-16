@@ -1,44 +1,49 @@
+<!-- submit.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Submit Article • Kashurpedia</title>
-  <link rel="stylesheet" href="styles.css"/>
-  <script defer src="config.js"></script>
-  <script defer src="templates.js"></script>
-  <script defer src="app.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Submit Article</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <div class="container nav">
-    <a class="logo" href="index.html">Kashurpedia</a>
-    <div class="user" id="userBox"></div>
-  </div>
-</header>
-
-<main class="container" style="padding:18px 0 36px;">
-  <h2>Create a new article</h2>
-  <form id="createForm" class="form">
-    <label>Title<input class="input" name="title" required /></label>
-
-    <label>Category (type)
-      <select class="input" name="type" id="typeSelect" required></select>
-    </label>
-
-    <div id="templateFields"></div>
-
-    <label>Body (supports [[Wiki Links]])
-      <textarea name="body" placeholder="Write the main content..." required></textarea>
-    </label>
-
-    <label>Tags/Categories (comma separated)
-      <input class="input" name="categories" placeholder="e.g. Village, Baramulla"/>
-    </label>
-
-    <button class="btn" type="submit">Publish</button>
-  </form>
-</main>
-
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <main>
+        <h2>Submit New Article</h2>
+        <form id="submit-form">
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+            <label for="category">Category:</label>
+            <select id="category" onchange="loadTemplate()">
+                <option value="Villages">Villages</option>
+                <option value="Districts">Districts</option>
+                <option value="Famous People">Famous People</option>
+                <option value="Colleges">Colleges</option>
+                <option value="Schools">Schools</option>
+                <option value="Mosques">Mosques</option>
+            </select>
+            <label for="content">Content (Wiki-style):</label>
+            <textarea id="content" rows="20" required></textarea>
+            <button type="button" onclick="submitArticle()">Submit</button>
+        </form>
+    </main>
+    <script src="config.js"></script>
+    <script src="templates.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            if (!localStorage.getItem('username')) {
+                window.location.href = 'login.html';
+            }
+            loadTemplate();
+        });
+    </script>
 </body>
 </html>
