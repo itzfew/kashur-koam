@@ -1,2 +1,2 @@
-// Set this to your deployed Apps Script Web App URL (ends with /exec)
-const GAS_URL = "https://script.google.com/macros/s/AKfycbwRsHAusg29OKweCUUj-89ApK44V5Lg0vuhsXQAjsgqezdtvPzxgIw5D9jDKfdKYw8Apg/exec";
+// config.js
+const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec'; // Replace with your deployed Apps Script URL
