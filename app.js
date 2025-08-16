@@ -110,6 +110,38 @@ async function searchArticles() {
     }
 }
 
+function parseWikiText(content, idMap) {
+    let html = content;
+    // Convert ==Section== to <h2>Section</h2>
+    html = html.replace(/^==\s*([^=]+)\s*==$/gm, '<h2>$1</h2>');
+    // Convert ===Subsection=== to <h3>Subsection</h3>
+    html = html.replace(/^===\s*([^=]+)\s*===$/gm, '<h3>$1</h3>');
+    // Convert '''bold''' to <strong>bold</strong>
+    html = html.replace(/'''([^']+)'''/g, '<strong>$1</strong>');
+    // Convert ''italic'' to <em>italic</em>
+    html = html.replace(/''([^']+)''/g, '<em>$1</em>');
+    // Convert * Item to <ul><li>Item</li></ul>
+    html = html.replace(/^\*\s*(.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    // Automatically link article titles
+    for (const [title, titleId] of Object.entries(idMap)) {
+        const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b`, 'g');
+        html = html.replace(regex, `<a href="article.html?id=${encodeURIComponent(titleId)}">${title}</a>`);
+    }
+    // Convert [[Link]] to <a href="article.html?id=ID">Link</a>
+    html = html.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
+        return `<a href="article.html?id=${encodeURIComponent(idMap[title] || '')}">${title}</a>`;
+    });
+    // Wrap paragraphs
+    html = html.split('\n').map(line => {
+        if (!line.match(/^(<h[23]|<ul|<li)/)) {
+            return `<p>${line}</p>`;
+        }
+        return line;
+    }).join('');
+    return html;
+}
+
 async function loadArticle(id) {
     showLoading();
     try {
@@ -121,14 +153,6 @@ async function loadArticle(id) {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('page-title').textContent = `Kashurpedia - ${article.title}`;
         let content = article.content;
-        // Automatically link text matching article titles
-        for (const [title, titleId] of Object.entries(article.idMap)) {
-            const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b`, 'g');
-            content = content.replace(regex, `<a href="article.html?id=${encodeURIComponent(titleId)}">${title}</a>`);
-        }
-        content = content.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
-            return `<a href="article.html?id=${encodeURIComponent(article.idMap[title] || '')}">${title}</a>`;
-        });
         const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
         if (infoboxMatch) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
@@ -144,7 +168,8 @@ async function loadArticle(id) {
             });
             return citation;
         });
-        document.getElementById('article-content').innerHTML = content.replace(/{{Cite(.*?)}}/g, (match, index) => `<sup>[${citationMatches.indexOf(match) + 1}]</sup>`);
+        content = content.replace(/{{Cite(.*?)}}/g, (match, index) => `<sup>[${citationMatches.indexOf(match) + 1}]</sup>`);
+        document.getElementById('article-content').innerHTML = parseWikiText(content, article.idMap);
         const citationList = document.getElementById('citations-list');
         citationList.innerHTML = '';
         citations.forEach((citation, index) => {
@@ -168,6 +193,50 @@ function parseInfobox(content) {
     });
     html += '</table>';
     return html;
+}
+
+function validateContent(content, category) {
+    const errors = [];
+    // Check for Infobox
+    if (!content.match(/{{Infobox\s*\|/)) {
+        errors.push('Missing {{Infobox}} template. Include an Infobox with required fields.');
+    } else {
+        const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
+        if (infoboxMatch) {
+            const fields = infoboxMatch[1].split('|').filter(line => line.includes('=')).map(line => line.split('=')[0].trim());
+            const requiredFields = {
+                'Villages': ['name', 'district', 'population'],
+                'Districts': ['name', 'capital', 'area'],
+                'Famous People': ['name', 'birth_date', 'occupation'],
+                'Colleges': ['name', 'established', 'location'],
+                'Schools': ['name', 'established', 'location'],
+                'Mosques': ['name', 'built', 'location']
+            }[category];
+            for (const field of requiredFields) {
+                if (!fields.includes(field)) {
+                    errors.push(`Missing required Infobox field: ${field}`);
+                }
+            }
+        }
+    }
+    // Check for References section
+    if (!content.match(/==References==/)) {
+        errors.push('Missing ==References== section. Add a References section with at least one {{Cite}} template.');
+    }
+    // Check for valid Cite templates
+    const citationMatches = content.match(/{{Cite(.*?)}}/gs) || [];
+    citationMatches.forEach((match, index) => {
+        const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+        const citation = {};
+        params.forEach(param => {
+            const [key, value] = param.split('=').map(s => s.trim());
+            citation[key] = value;
+        });
+        if (!citation.title) {
+            errors.push(`Citation ${index + 1} missing title. Use |title= in {{Cite}} template.`);
+        }
+    });
+    return errors;
 }
 
 async function loadArticleForEdit(id) {
@@ -258,6 +327,12 @@ async function submitArticle() {
     const category = document.getElementById('category').value;
     const content = document.getElementById('content').value;
     const userId = localStorage.getItem('userId');
+    const errors = validateContent(content, category);
+    if (errors.length > 0) {
+        alert('Submission errors:\n- ' + errors.join('\n- '));
+        hideLoading();
+        return;
+    }
     try {
         const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${title}&category=${category}&content=${content}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
@@ -281,6 +356,12 @@ async function editArticle() {
     const summary = document.getElementById('summary').value;
     const category = document.getElementById('category').value;
     const userId = localStorage.getItem('userId');
+    const errors = validateContent(content, category);
+    if (errors.length > 0) {
+        alert('Submission errors:\n- ' + errors.join('\n- '));
+        hideLoading();
+        return;
+    }
     try {
         const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&content=${content}&summary=${summary}&editorId=${userId}&category=${category}`, {method: 'POST'});
         const data = await response.json();
