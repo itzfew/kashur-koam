@@ -15,7 +15,6 @@ function checkLogin() {
     if (username) {
         const profile = document.getElementById('user-profile');
         profile.innerHTML = name.charAt(0).toUpperCase();
-        profile.title = username;
         profile.setAttribute('tooltip', username);
     }
 }
@@ -113,13 +112,25 @@ async function searchArticles() {
 
 function parseWikiText(content, idMap) {
     let html = content.trim();
-    // Convert ==Section== to <h2>Section</h2>
-    html = html.replace(/^==\s*([^\n=]+?)\s*==$/gm, '<h2>$1</h2>');
-    // Convert ===Subsection=== to <h3>Subsection</h3>
-    html = html.replace(/^===\s*([^\n=]+?)\s*===$/gm, '<h3>$1</h3>');
-    // Convert '''bold''' to <strong>bold</strong>
+    // Convert ==Section== to collapsible heading
+    html = html.replace(/^==\s*([^\n=]+?)\s*==$/gm, (match, title) => `
+        <div class="mw-heading mw-heading2 section-heading collapsible-heading open-block" role="button" tabindex="0">
+            <span class="mf-icon mf-icon-expand mf-icon--small indicator"></span>
+            <h2 id="${title.replace(/\s+/g, '_')}">${title}</h2>
+            <span class="mw-editsection">
+                <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet" href="#" role="button" title="Edit section: ${title}">
+                    <span class="minerva-icon minerva-icon--edit"></span>
+                    <span style="border: 0; clip: rect(1px, 1px, 1px, 1px); display: block; height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute !important; width: 1px;">edit</span>
+                </a>
+            </span>
+        </div>
+        <section class="mf-section-0 collapsible-block collapsible-block-js open-block">
+    `);
+    // Convert ===Subsection=== to <h3>
+    html = html.replace(/^===\s*([^\n=]+?)\s*===$/gm, '</section><h3>$1</h3>');
+    // Convert '''bold''' to <strong>
     html = html.replace(/'''([^']+?)'''/g, '<strong>$1</strong>');
-    // Convert ''italic'' to <em>italic</em>
+    // Convert ''italic'' to <em>
     html = html.replace(/''([^']+?)''/g, '<em>$1</em>');
     // Convert * Item to <ul><li>Item</li></ul>
     let listLevel = 0;
@@ -147,6 +158,8 @@ function parseWikiText(content, idMap) {
     if (listLevel > 0) {
         html += '</ul>'.repeat(listLevel);
     }
+    // Close open sections
+    html += '</section>';
     // Automatically link article titles
     for (const [title, titleId] of Object.entries(idMap)) {
         const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b(?![^\[]*\]\])`, 'g');
@@ -169,10 +182,11 @@ async function loadArticle(id) {
         }
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('page-title').textContent = `Kashurpedia - ${article.title}`;
+        document.getElementById('short-description').textContent = article.shortDescription || '';
         let content = article.content;
         const infoboxMatch = content.match(/{{Infobox\s*\|(.*?)}}/s);
         if (infoboxMatch) {
-            document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
+            document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1], article.category);
             content = content.replace(/{{Infobox\s*\|(.*?)}}/s, '');
         }
         const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
@@ -186,16 +200,31 @@ async function loadArticle(id) {
             return citation;
         });
         content = parseWikiText(content, article.idMap);
-        content = content.replace(/{{Cite\s*\|(.*?)}}/g, (match, index) => `<sup title="Citation ${citationMatches.indexOf(match) + 1}">[${citationMatches.indexOf(match) + 1}]</sup>`);
+        content = content.replace(/{{Cite\s*\|(.*?)}}/g, (match, index) => `<sup class="reference" title="Citation ${citationMatches.indexOf(match) + 1}"><a href="#cite_note-${citationMatches.indexOf(match) + 1}">[${citationMatches.indexOf(match) + 1}]</a></sup>`);
         document.getElementById('article-content').innerHTML = content;
-        const citationList = document.getElementById('citations-list');
-        citationList.innerHTML = '';
+        const citationList = document.createElement('ol');
+        citationList.id = 'cite-references';
+        citationList.style.margin = '1em 0 1em 2em';
         citations.forEach((citation, index) => {
             const li = document.createElement('li');
+            li.id = `cite_note-${index + 1}`;
             li.innerHTML = citation.url ? `<a href="${citation.url}" target="_blank">${citation.title || 'Source'}</a> (${citation.author || 'Unknown'}, ${citation.date || 'No date'})` : `${citation.title || 'Source'} (${citation.author || 'Unknown'}, ${citation.date || 'No date'})`;
-            li.setAttribute('tooltip', `Citation ${index + 1}`);
             citationList.appendChild(li);
         });
+        if (citations.length > 0) {
+            const refSection = document.createElement('div');
+            refSection.className = 'mw-heading mw-heading2 section-heading collapsible-heading open-block';
+            refSection.innerHTML = `
+                <span class="mf-icon mf-icon-expand mf-icon--small indicator"></span>
+                <h2 id="References">References</h2>
+            `;
+            const refContent = document.createElement('section');
+            refContent.className = 'mf-section-0 collapsible-block collapsible-block-js open-block';
+            refContent.appendChild(citationList);
+            document.getElementById('article-content').appendChild(refSection);
+            document.getElementById('article-content').appendChild(refContent);
+        }
+        document.getElementById('citation-notice').style.display = citations.length === 0 ? 'block' : 'none';
     } catch (error) {
         alert('Error loading article: ' + error.message);
     } finally {
@@ -203,16 +232,38 @@ async function loadArticle(id) {
     }
 }
 
-function parseInfobox(content) {
+async function loadTalk(id) {
+    showLoading();
+    try {
+        const response = await fetch(`${SCRIPT_URL}?action=getArticleById&id=${id}`);
+        const article = await response.json();
+        if (!article.title) {
+            throw new Error('Article not found');
+        }
+        document.getElementById('article-title').textContent = `Talk: ${article.title}`;
+        document.getElementById('page-title').textContent = `Kashurpedia - Talk: ${article.title}`;
+        document.getElementById('short-description').textContent = article.shortDescription || '';
+        await loadComments(id);
+        document.getElementById('comments').style.display = 'block';
+    } catch (error) {
+        alert('Error loading talk page: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+function parseInfobox(content, category) {
     const lines = content.split('|').filter(line => line.includes('='));
-    let html = '<table>';
+    let html = '<tbody>';
+    html += `<tr><th class="infobox-above" colspan="2"><div class="fn org">${document.getElementById('article-title').textContent}</div></th></tr>`;
+    html += `<tr><td class="infobox-subheader" colspan="2"><div class="category">${category}</div></td></tr>`;
     lines.forEach(line => {
         const [key, value] = line.split('=').map(s => s.trim());
         if (key && value) {
-            html += `<tr><th>${key}:</th><td>${value}</td></tr>`;
+            html += `<tr><th class="infobox-label" scope="row">${key}</th><td class="infobox-data">${value}</td></tr>`;
         }
     });
-    html += '</table>';
+    html += '</tbody>';
     return html;
 }
 
@@ -330,6 +381,7 @@ async function loadArticleForEdit(id) {
             throw new Error('Article not found');
         }
         document.getElementById('title').value = article.title;
+        document.getElementById('short-description').value = article.shortDescription || '';
         document.getElementById('content').value = article.content;
         document.getElementById('category').value = article.category;
         loadTemplateOptions();
@@ -361,7 +413,6 @@ async function loadEditHistory(id) {
 }
 
 async function loadComments(id) {
-    showLoading();
     try {
         const response = await fetch(`${SCRIPT_URL}?action=getComments&id=${id}`);
         const comments = await response.json();
@@ -375,8 +426,6 @@ async function loadComments(id) {
         });
     } catch (error) {
         alert('Error loading comments: ' + error.message);
-    } finally {
-        hideLoading();
     }
 }
 
@@ -414,6 +463,7 @@ async function submitComment() {
 async function submitArticle() {
     showLoading();
     const title = document.getElementById('title').value;
+    const shortDescription = document.getElementById('short-description').value;
     const category = document.getElementById('category').value;
     const content = document.getElementById('content').value;
     const userId = localStorage.getItem('userId');
@@ -423,6 +473,11 @@ async function submitArticle() {
         sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
         citations: document.getElementById('include-citations').checked
     };
+    if (shortDescription.length > 500) {
+        alert('Short description must be under 500 characters');
+        hideLoading();
+        return;
+    }
     const errors = validateContent(content, category, selectedOptions);
     if (errors.length > 0) {
         alert('Submission errors:\n- ' + errors.join('\n- '));
@@ -430,7 +485,7 @@ async function submitArticle() {
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${encodeURIComponent(title)}&category=${category}&content=${encodeURIComponent(content)}&authorId=${userId}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${encodeURIComponent(title)}&shortDescription=${encodeURIComponent(shortDescription)}&category=${category}&content=${encodeURIComponent(content)}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             window.location.href = `article.html?id=${encodeURIComponent(data.articleId)}`;
@@ -448,6 +503,7 @@ async function editArticle() {
     showLoading();
     const id = new URLSearchParams(window.location.search).get('id');
     const title = document.getElementById('title').value;
+    const shortDescription = document.getElementById('short-description').value;
     const content = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
     const category = document.getElementById('category').value;
@@ -458,6 +514,11 @@ async function editArticle() {
         sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
         citations: document.getElementById('include-citations').checked
     };
+    if (shortDescription.length > 500) {
+        alert('Short description must be under 500 characters');
+        hideLoading();
+        return;
+    }
     const errors = validateContent(content, category, selectedOptions);
     if (errors.length > 0) {
         alert('Submission errors:\n- ' + errors.join('\n- '));
@@ -465,7 +526,7 @@ async function editArticle() {
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&content=${encodeURIComponent(content)}&summary=${encodeURIComponent(summary)}&editorId=${userId}&category=${category}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&shortDescription=${encodeURIComponent(shortDescription)}&content=${encodeURIComponent(content)}&summary=${encodeURIComponent(summary)}&editorId=${userId}&category=${category}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             window.location.href = `article.html?id=${encodeURIComponent(id)}`;
