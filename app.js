@@ -1,4 +1,3 @@
-// app.js
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
 }
@@ -126,7 +125,7 @@ async function searchArticles() {
     } finally {
         hideLoading();
     }
-} 
+}
 
 function parseWikiText(content, idMap) {
     let html = content.trim();
@@ -242,7 +241,6 @@ async function loadArticle(id) {
             document.getElementById('article-content').appendChild(refSection);
             document.getElementById('article-content').appendChild(refContent);
         }
-        document.getElementById('citation-notice').style.display = citations.length === 0 ? 'block' : 'none';
     } catch (error) {
         alert('Error loading article: ' + error.message);
     } finally {
