@@ -1,3 +1,5 @@
+
+// app.js
 function checkLogin() {
     const username = localStorage.getItem('username');
     const name = localStorage.getItem('name');
@@ -11,15 +13,15 @@ function checkLogin() {
 async function login() {
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
-    const response = await fetch(`${SCRIPT_URL}?action=login&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`);
+    const response = await fetch(`${SCRIPT_URL}?action=login&username=${username}&email=${email}`);
     const data = await response.json();
     if (data.success) {
-        localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', username);
         localStorage.setItem('name', data.name);
+        localStorage.setItem('userId', data.userId);
         window.location.href = 'index.html';
     } else {
-        alert('Login failed: ' + (data.message || 'Invalid credentials'));
+        alert('Login failed');
     }
 }
 
@@ -27,72 +29,15 @@ async function signup() {
     const name = document.getElementById('name').value;
     const username = document.getElementById('username').value;
     const email = document.getElementById('email').value;
-    const response = await fetch(`${SCRIPT_URL}?action=signup&name=${encodeURIComponent(name)}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`);
+    const response = await fetch(`${SCRIPT_URL}?action=signup&name=${name}&username=${username}&email=${email}`);
     const data = await response.json();
     if (data.success) {
-        localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', username);
         localStorage.setItem('name', name);
+        localStorage.setItem('userId', data.userId);
         window.location.href = 'index.html';
     } else {
         alert('Signup failed: ' + data.message);
-    }
-}
-
-async function loadCategories() {
-    const defaultCategories = [
-        {name: 'Villages'},
-        {name: 'Districts'},
-        {name: 'Famous People'},
-        {name: 'Colleges'},
-        {name: 'Schools'},
-        {name: 'Mosques'}
-    ];
-    try {
-        const response = await fetch(`${SCRIPT_URL}?action=getCategories`);
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const categories = await response.json();
-        console.log('Fetched categories:', categories);
-        const list = document.getElementById('category-list');
-        const select = document.getElementById('category');
-        if (list) {
-            list.innerHTML = '';
-            categories.forEach(category => {
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#" onclick="loadArticlesByCategory('${category.name}')">${category.name}</a>`;
-                list.appendChild(li);
-            });
-        }
-        if (select) {
-            select.innerHTML = '';
-            if (categories.length === 0) {
-                console.warn('No categories fetched, using defaults');
-                categories.push(...defaultCategories);
-                document.getElementById('category-error').style.display = 'block';
-            } else {
-                document.getElementById('category-error').style.display = 'none';
-            }
-            categories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.name;
-                option.textContent = category.name;
-                select.appendChild(option);
-            });
-        }
-    } catch (error) {
-        console.error('Error loading categories:', error);
-        const select = document.getElementById('category');
-        if (select) {
-            select.innerHTML = '';
-            defaultCategories.forEach(category => {
-                const option = document.createElement('option');
-                option.value = category.name;
-                option.textContent = category.name;
-                select.appendChild(option);
-            });
-            document.getElementById('category-error').style.display = 'block';
-        }
-        alert('Failed to load categories. Using default categories. Error: ' + error.message);
     }
 }
 
@@ -103,30 +48,32 @@ async function loadLatestArticles() {
     list.innerHTML = '';
     articles.forEach(article => {
         const li = document.createElement('li');
-        li.innerHTML = `<a href="article.html?slug=${encodeURIComponent(article.slug)}">${article.title}</a>`;
+        li.innerHTML = `<a href="article.html?title=${encodeURIComponent(article.title)}">${article.title}</a>`;
         list.appendChild(li);
     });
 }
 
 async function loadArticlesByCategory(category) {
-    const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${encodeURIComponent(category)}`);
+    const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${category}`);
     const articles = await response.json();
+    // Display in a new section or modal, for simplicity alert
     alert(articles.map(a => a.title).join('\n'));
 }
 
 async function searchArticles() {
     const query = document.getElementById('search-bar').value;
-    const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${encodeURIComponent(query)}`);
+    const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${query}`);
     const articles = await response.json();
+    // Similar to above, display results
     alert(articles.map(a => a.title).join('\n'));
 }
 
-async function loadArticle(slug) {
-    const response = await fetch(`${SCRIPT_URL}?action=getArticle&slug=${encodeURIComponent(slug)}`);
+async function loadArticle(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
     const article = await response.json();
     document.getElementById('article-title').textContent = article.title;
-    document.getElementById('article-categories').textContent = article.categories.join(', ');
-    const content = article.contentText.replace(/\[\[([^\]]+)\]\]/g, '<a href="article.html?slug=$1">$1</a>');
+    // Parse content for infobox and links
+    const content = article.content.replace(/\[\[([^\]]+)\]\]/g, '<a href="article.html?title=$1">$1</a>');
     const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
     if (infoboxMatch) {
         document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
@@ -135,6 +82,7 @@ async function loadArticle(slug) {
 }
 
 function parseInfobox(content) {
+    // Simple parsing, convert |key=value to table
     const lines = content.split('|');
     let html = '<table>';
     lines.forEach(line => {
@@ -147,92 +95,77 @@ function parseInfobox(content) {
     return html;
 }
 
-async function loadArticleForEdit(slug) {
-    const response = await fetch(`${SCRIPT_URL}?action=getArticle&slug=${encodeURIComponent(slug)}`);
+async function loadArticleForEdit(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
     const article = await response.json();
     document.getElementById('title').value = article.title;
-    document.getElementById('content').value = article.contentText;
-    const select = document.getElementById('category');
-    Array.from(select.options).forEach(option => {
-        option.selected = article.categories.includes(option.value);
-    });
+    document.getElementById('content').value = article.content;
 }
 
-async function loadEditHistory(slug) {
-    const response = await fetch(`${SCRIPT_URL}?action=getEditHistory&slug=${encodeURIComponent(slug)}`);
+async function loadEditHistory(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getEditHistory&title=${title}`);
     const history = await response.json();
     const list = document.getElementById('history-list');
     list.innerHTML = '';
     history.forEach(edit => {
         const li = document.createElement('li');
-        li.textContent = `${edit.createdAt} by ${edit.editorId}: ${edit.summary}`;
+        li.textContent = `${edit.date} by ${edit.editor}: ${edit.summary}`;
         list.appendChild(li);
     });
 }
 
-async function loadComments(slug) {
-    const response = await fetch(`${SCRIPT_URL}?action=getComments&slug=${encodeURIComponent(slug)}`);
+async function loadComments(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getComments&title=${title}`);
     const comments = await response.json();
     const list = document.getElementById('comments-list');
     list.innerHTML = '';
     comments.forEach(comment => {
         const li = document.createElement('li');
-        li.textContent = `${comment.createdAt} by ${comment.authorId}: ${comment.body}`;
+        li.textContent = `${comment.date} by ${comment.commenter}: ${comment.comment}`;
         list.appendChild(li);
     });
 }
 
 async function submitComment() {
-    const slug = new URLSearchParams(window.location.search).get('slug');
-    const body = document.getElementById('new-comment').value;
-    const authorId = localStorage.getItem('userId');
-    if (!authorId) return alert('Login required');
-    const response = await fetch(`${SCRIPT_URL}?action=addComment&slug=${encodeURIComponent(slug)}&body=${encodeURIComponent(body)}&authorId=${encodeURIComponent(authorId)}`);
+    const title = document.getElementById('article-title').textContent;
+    const comment = document.getElementById('new-comment').value;
+    const userId = localStorage.getItem('userId');
+    if (!userId) return alert('Login required');
+    const response = await fetch(`${SCRIPT_URL}?action=addComment&title=${title}&comment=${comment}&authorId=${userId}`, {method: 'POST'});
     const data = await response.json();
     if (data.success) {
-        loadComments(slug);
-        document.getElementById('new-comment').value = '';
-    } else {
-        alert('Comment submission failed');
+        loadComments(title);
     }
 }
 
 async function submitArticle() {
     const title = document.getElementById('title').value;
-    const categories = Array.from(document.getElementById('category').selectedOptions).map(opt => opt.value);
-    const contentText = document.getElementById('content').value;
-    const authorId = localStorage.getItem('userId');
-    if (!authorId) return alert('Login required');
-    if (categories.length === 0) return alert('Please select at least one category');
-    const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${encodeURIComponent(title)}&categories=${encodeURIComponent(categories.join(','))}&contentText=${encodeURIComponent(contentText)}&authorId=${encodeURIComponent(authorId)}`);
+    const category = document.getElementById('category').value;
+    const content = document.getElementById('content').value;
+    const userId = localStorage.getItem('userId');
+    const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${title}&category=${category}&content=${content}&authorId=${userId}`, {method: 'POST'});
     const data = await response.json();
     if (data.success) {
-        window.location.href = `article.html?slug=${encodeURIComponent(data.slug)}`;
+        window.location.href = `article.html?title=${encodeURIComponent(title)}`;
     } else {
         alert('Submit failed: ' + data.message);
     }
 }
 
 async function editArticle() {
-    const slug = new URLSearchParams(window.location.search).get('slug');
     const title = document.getElementById('title').value;
-    const categories = Array.from(document.getElementById('category').selectedOptions).map(opt => opt.value);
-    const contentText = document.getElementById('content').value;
+    const content = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
-    const editorId = localStorage.getItem('userId');
-    if (categories.length === 0) return alert('Please select at least one category');
-    const response = await fetch(`${SCRIPT_URL}?action=editArticle&slug=${encodeURIComponent(slug)}&title=${encodeURIComponent(title)}&categories=${encodeURIComponent(categories.join(','))}&contentText=${encodeURIComponent(contentText)}&summary=${encodeURIComponent(summary)}&editorId=${encodeURIComponent(editorId)}`);
+    const userId = localStorage.getItem('userId');
+    const response = await fetch(`${SCRIPT_URL}?action=editArticle&title=${title}&content=${content}&summary=${summary}&editorId=${userId}`, {method: 'POST'});
     const data = await response.json();
     if (data.success) {
-        window.location.href = `article.html?slug=${encodeURIComponent(slug)}`;
-    } else {
-        alert('Edit failed: ' + data.message);
+        window.location.href = `article.html?title=${encodeURIComponent(title)}`;
     }
 }
 
 function loadTemplate() {
-    const select = document.getElementById('category');
-    const category = select && select.selectedOptions.length > 0 ? select.selectedOptions[0].value : 'Villages';
+    const category = document.getElementById('category').value;
     const template = TEMPLATES[category] || '';
     document.getElementById('content').value = template;
 }
