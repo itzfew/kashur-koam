@@ -24,21 +24,27 @@
             <button onclick="searchArticles()">Search</button>
         </div>
     </header>
-    <main>
-        <h2 id="article-title"></h2>
-        <div id="infobox"></div>
-        <div id="article-content"></div>
-        <a href="#" id="edit-link" class="edit-link">Edit</a>
-        <section id="edit-history">
-            <h3>Edit History</h3>
-            <ul id="history-list"></ul>
-        </section>
-        <section id="comments">
-            <h3>Comments</h3>
-            <ul id="comments-list"></ul>
-            <textarea id="new-comment" placeholder="Add your comment..."></textarea>
-            <button onclick="submitComment()">Add Comment</button>
-        </section>
+    <main class="article-main">
+        <div class="article-container">
+            <h2 id="article-title"></h2>
+            <div id="infobox"></div>
+            <div id="article-content"></div>
+            <section id="citations">
+                <h3>Citations</h3>
+                <ul id="citations-list"></ul>
+            </section>
+            <a href="#" id="edit-link" class="edit-link">Edit</a>
+            <section id="edit-history">
+                <h3>Edit History</h3>
+                <ul id="history-list"></ul>
+            </section>
+            <section id="comments">
+                <h3>Comments</h3>
+                <ul id="comments-list"></ul>
+                <textarea id="new-comment" placeholder="Add your comment..."></textarea>
+                <button onclick="submitComment()">Add Comment</button>
+            </section>
+        </div>
     </main>
     <script src="config.js"></script>
     <script src="app.js"></script>
