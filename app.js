@@ -1,3 +1,14 @@
+
+
+// app.js
+function showLoading() {
+    document.getElementById('loading').style.display = 'flex';
+}
+
+function hideLoading() {
+    document.getElementById('loading').style.display = 'none';
+}
+
 function checkLogin() {
     const username = localStorage.getItem('username');
     const name = localStorage.getItem('name');
@@ -5,20 +16,6 @@ function checkLogin() {
         const profile = document.getElementById('user-profile');
         profile.innerHTML = name.charAt(0).toUpperCase();
         profile.title = username;
-    }
-}
-
-function showLoading() {
-    const loading = document.getElementById('loading');
-    if (loading) {
-        loading.style.display = 'block';
-    }
-}
-
-function hideLoading() {
-    const loading = document.getElementById('loading');
-    if (loading) {
-        loading.style.display = 'none';
     }
 }
 
@@ -37,6 +34,8 @@ async function login() {
         } else {
             alert('Login failed');
         }
+    } catch (error) {
+        alert('Error during login: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -58,6 +57,8 @@ async function signup() {
         } else {
             alert('Signup failed: ' + data.message);
         }
+    } catch (error) {
+        alert('Error during signup: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -75,6 +76,8 @@ async function loadLatestArticles() {
             li.innerHTML = `<a href="article.html?title=${encodeURIComponent(article.title)}">${article.title}</a>`;
             list.appendChild(li);
         });
+    } catch (error) {
+        alert('Error loading articles: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -86,6 +89,8 @@ async function loadArticlesByCategory(category) {
         const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${category}`);
         const articles = await response.json();
         alert(articles.map(a => a.title).join('\n'));
+    } catch (error) {
+        alert('Error loading category articles: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -98,6 +103,8 @@ async function searchArticles() {
         const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${query}`);
         const articles = await response.json();
         alert(articles.map(a => a.title).join('\n'));
+    } catch (error) {
+        alert('Error searching articles: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -115,19 +122,19 @@ async function loadArticle(title) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
         }
         document.getElementById('article-content').innerHTML = content.replace(/{{Infobox(.*?)}}/s, '');
+    } catch (error) {
+        alert('Error loading article: ' + error.message);
     } finally {
         hideLoading();
     }
 }
 
 function parseInfobox(content) {
-    const lines = content.split('|').filter(line => line.trim() && line.includes('='));
+    const lines = content.split('|').filter(line => line.includes('='));
     let html = '<table>';
     lines.forEach(line => {
         const [key, value] = line.split('=').map(s => s.trim());
-        if (key && value) {
-            html += `<tr><th style="font-weight: bold; text-align: right; padding-right: 10px;">${key}:</th><td>${value}</td></tr>`;
-        }
+        html += `<tr><th>${key}:</th><td>${value}</td></tr>`;
     });
     html += '</table>';
     return html;
@@ -140,13 +147,9 @@ async function loadArticleForEdit(title) {
         const article = await response.json();
         document.getElementById('title').value = article.title;
         document.getElementById('content').value = article.content;
-        const categoryResponse = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
-        const articleData = await categoryResponse.json();
-        if (articleData.category) {
-            document.getElementById('category').value = articleData.category;
-        } else {
-            document.getElementById('content').value = TEMPLATES[articleData.category] || article.content;
-        }
+        document.getElementById('category').value = article.category;
+    } catch (error) {
+        alert('Error loading article for edit: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -164,6 +167,8 @@ async function loadEditHistory(title) {
             li.textContent = `${edit.date} by ${edit.editor}: ${edit.summary}`;
             list.appendChild(li);
         });
+    } catch (error) {
+        alert('Error loading edit history: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -181,6 +186,8 @@ async function loadComments(title) {
             li.textContent = `${comment.date} by ${comment.commenter}: ${comment.comment}`;
             list.appendChild(li);
         });
+    } catch (error) {
+        alert('Error loading comments: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -203,8 +210,10 @@ async function submitComment() {
             loadComments(title);
             document.getElementById('new-comment').value = '';
         } else {
-            alert('Comment submission failed');
+            alert('Failed to add comment');
         }
+    } catch (error) {
+        alert('Error adding comment: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -224,6 +233,8 @@ async function submitArticle() {
         } else {
             alert('Submit failed: ' + data.message);
         }
+    } catch (error) {
+        alert('Error submitting article: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -234,15 +245,18 @@ async function editArticle() {
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
+    const category = document.getElementById('category').value;
     const userId = localStorage.getItem('userId');
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=editArticle&title=${title}&content=${content}&summary=${summary}&editorId=${userId}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=editArticle&title=${title}&content=${content}&summary=${summary}&editorId=${userId}&category=${category}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             window.location.href = `article.html?title=${encodeURIComponent(title)}`;
         } else {
             alert('Edit failed');
         }
+    } catch (error) {
+        alert('Error editing article: ' + error.message);
     } finally {
         hideLoading();
     }
@@ -251,8 +265,8 @@ async function editArticle() {
 function loadTemplate() {
     const category = document.getElementById('category').value;
     const template = TEMPLATES[category] || '';
-    const currentContent = document.getElementById('content').value;
-    if (!currentContent || currentContent === TEMPLATES[currentContent.category]) {
-        document.getElementById('content').value = template;
+    const content = document.getElementById('content');
+    if (!content.value || confirm('Load template? This will overwrite current content.')) {
+        content.value = template;
     }
 }
