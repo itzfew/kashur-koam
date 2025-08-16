@@ -1,5 +1,3 @@
-
-
 // app.js
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
@@ -73,7 +71,7 @@ async function loadLatestArticles() {
         list.innerHTML = '';
         articles.forEach(article => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="article.html?title=${encodeURIComponent(article.title)}">${article.title}</a>`;
+            li.innerHTML = `<a href="article.html?id=${encodeURIComponent(article.id)}">${article.title}</a>`;
             list.appendChild(li);
         });
     } catch (error) {
@@ -110,13 +108,18 @@ async function searchArticles() {
     }
 }
 
-async function loadArticle(title) {
+async function loadArticle(id) {
     showLoading();
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
+        const response = await fetch(`${SCRIPT_URL}?action=getArticleById&id=${id}`);
         const article = await response.json();
+        if (!article.title) {
+            throw new Error('Article not found');
+        }
         document.getElementById('article-title').textContent = article.title;
-        const content = article.content.replace(/\[\[([^\]]+)\]\]/g, '<a href="article.html?title=$1">$1</a>');
+        const content = article.content.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
+            return `<a href="article.html?id=${encodeURIComponent(article.idMap[title] || '')}">${title}</a>`;
+        });
         const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
         if (infoboxMatch) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
@@ -140,11 +143,14 @@ function parseInfobox(content) {
     return html;
 }
 
-async function loadArticleForEdit(title) {
+async function loadArticleForEdit(id) {
     showLoading();
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
+        const response = await fetch(`${SCRIPT_URL}?action=getArticleById&id=${id}`);
         const article = await response.json();
+        if (!article.title) {
+            throw new Error('Article not found');
+        }
         document.getElementById('title').value = article.title;
         document.getElementById('content').value = article.content;
         document.getElementById('category').value = article.category;
@@ -155,10 +161,10 @@ async function loadArticleForEdit(title) {
     }
 }
 
-async function loadEditHistory(title) {
+async function loadEditHistory(id) {
     showLoading();
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=getEditHistory&title=${title}`);
+        const response = await fetch(`${SCRIPT_URL}?action=getEditHistory&id=${id}`);
         const history = await response.json();
         const list = document.getElementById('history-list');
         list.innerHTML = '';
@@ -174,10 +180,10 @@ async function loadEditHistory(title) {
     }
 }
 
-async function loadComments(title) {
+async function loadComments(id) {
     showLoading();
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=getComments&title=${title}`);
+        const response = await fetch(`${SCRIPT_URL}?action=getComments&id=${id}`);
         const comments = await response.json();
         const list = document.getElementById('comments-list');
         list.innerHTML = '';
@@ -195,7 +201,7 @@ async function loadComments(title) {
 
 async function submitComment() {
     showLoading();
-    const title = document.getElementById('article-title').textContent;
+    const id = new URLSearchParams(window.location.search).get('id');
     const comment = document.getElementById('new-comment').value;
     const userId = localStorage.getItem('userId');
     if (!userId) {
@@ -204,10 +210,10 @@ async function submitComment() {
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=addComment&title=${title}&comment=${comment}&authorId=${userId}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=addComment&id=${id}&comment=${comment}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
-            loadComments(title);
+            loadComments(id);
             document.getElementById('new-comment').value = '';
         } else {
             alert('Failed to add comment');
@@ -229,7 +235,7 @@ async function submitArticle() {
         const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${title}&category=${category}&content=${content}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
-            window.location.href = `article.html?title=${encodeURIComponent(title)}`;
+            window.location.href = `article.html?id=${encodeURIComponent(data.articleId)}`;
         } else {
             alert('Submit failed: ' + data.message);
         }
@@ -242,16 +248,17 @@ async function submitArticle() {
 
 async function editArticle() {
     showLoading();
+    const id = new URLSearchParams(window.location.search).get('id');
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
     const summary = document.getElementById('summary').value;
     const category = document.getElementById('category').value;
     const userId = localStorage.getItem('userId');
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=editArticle&title=${title}&content=${content}&summary=${summary}&editorId=${userId}&category=${category}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&content=${content}&summary=${summary}&editorId=${userId}&category=${category}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
-            window.location.href = `article.html?title=${encodeURIComponent(title)}`;
+            window.location.href = `article.html?id=${encodeURIComponent(id)}`;
         } else {
             alert('Edit failed');
         }
