@@ -22,6 +22,7 @@
             <select id="category" multiple required>
                 <!-- Populated dynamically -->
             </select>
+            <div id="category-error" style="color: red; display: none;">Failed to load categories. Please refresh the page.</div>
             <label for="content">Content (Wiki-style):</label>
             <textarea id="content" rows="20" required></textarea>
             <button type="button" onclick="submitArticle()">Submit</button>
