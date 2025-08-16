@@ -1,0 +1,654 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Home</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+        <input type="text" id="search-bar" placeholder="Search articles...">
+        <button onclick="searchArticles()">Search</button>
+    </header>
+    <main>
+        <section id="categories">
+            <h2>Categories</h2>
+            <ul>
+                <li><a href="#" onclick="loadArticlesByCategory('Villages')">Villages</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Districts')">Districts</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Famous People')">Famous People</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Colleges')">Colleges</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Schools')">Schools</a></li>
+                <li><a href="#" onclick="loadArticlesByCategory('Mosques')">Mosques</a></li>
+            </ul>
+        </section>
+        <section id="latest-articles">
+            <h2>Latest Articles</h2>
+            <ul id="latest-list"></ul>
+        </section>
+        <a href="submit.html">Submit New Article</a>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            loadLatestArticles();
+        });
+    </script>
+</body>
+</html>
+<!-- article.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Article</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+        <input type="text" id="search-bar" placeholder="Search articles...">
+        <button onclick="searchArticles()">Search</button>
+    </header>
+    <main>
+        <h2 id="article-title"></h2>
+        <div id="infobox"></div>
+        <div id="article-content"></div>
+        <a href="#" id="edit-link">Edit</a>
+        <section id="edit-history">
+            <h3>Edit History</h3>
+            <ul id="history-list"></ul>
+        </section>
+        <section id="comments">
+            <h3>Comments</h3>
+            <ul id="comments-list"></ul>
+            <textarea id="new-comment"></textarea>
+            <button onclick="submitComment()">Add Comment</button>
+        </section>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const title = urlParams.get('title');
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            loadArticle(title);
+            loadEditHistory(title);
+            loadComments(title);
+            document.getElementById('edit-link').href = `edit.html?title=${encodeURIComponent(title)}`;
+        });
+    </script>
+</body>
+</html>
+<!-- submit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Submit Article</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <main>
+        <h2>Submit New Article</h2>
+        <form id="submit-form">
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+            <label for="category">Category:</label>
+            <select id="category" onchange="loadTemplate()">
+                <option value="Villages">Villages</option>
+                <option value="Districts">Districts</option>
+                <option value="Famous People">Famous People</option>
+                <option value="Colleges">Colleges</option>
+                <option value="Schools">Schools</option>
+                <option value="Mosques">Mosques</option>
+            </select>
+            <label for="content">Content (Wiki-style):</label>
+            <textarea id="content" rows="20" required></textarea>
+            <button type="button" onclick="submitArticle()">Submit</button>
+        </form>
+    </main>
+    <script src="config.js"></script>
+    <script src="templates.js"></script>
+    <script src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            if (!localStorage.getItem('username')) {
+                window.location.href = 'login.html';
+            }
+            loadTemplate();
+        });
+    </script>
+</body>
+</html>
+<!-- edit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Edit Article</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kashurpedia</h1>
+        <div id="user-profile">
+            <a href="login.html">Login</a>
+        </div>
+    </header>
+    <main>
+        <h2>Edit Article</h2>
+        <form id="edit-form">
+            <label for="title">Title:</label>
+            <input type="text" id="title" readonly>
+            <label for="content">Content:</label>
+            <textarea id="content" rows="20" required></textarea>
+            <label for="summary">Edit Summary:</label>
+            <input type="text" id="summary" required>
+            <button type="button" onclick="editArticle()">Save Edit</button>
+        </form>
+        <section id="edit-history">
+            <h3>Edit History</h3>
+            <ul id="history-list"></ul>
+        </section>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const title = urlParams.get('title');
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+            if (!localStorage.getItem('username')) {
+                window.location.href = 'login.html';
+            }
+            loadArticleForEdit(title);
+            loadEditHistory(title);
+        });
+    </script>
+</body>
+</html>
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kashurpedia - Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Kashurpedia</h1>
+    </header>
+    <main>
+        <h2>Login / Sign Up</h2>
+        <form id="login-form">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+            <button type="button" onclick="signup()">Sign Up</button>
+            <button type="button" onclick="login()">Login</button>
+        </form>
+    </main>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+header {
+    background: #f4f4f4;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#user-profile {
+    font-size: 20px;
+    background: #ddd;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+main {
+    padding: 20px;
+}
+#infobox {
+    float: right;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+}
+#article-content a {
+    color: blue;
+    text-decoration: underline;
+}
+form {
+    display: flex;
+    flex-direction: column;
+}
+input, textarea, select {
+    margin-bottom: 10px;
+    padding: 5px;
+}
+button {
+    padding: 10px;
+    background: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+// app.js
+function checkLogin() {
+    const username = localStorage.getItem('username');
+    const name = localStorage.getItem('name');
+    if (username) {
+        const profile = document.getElementById('user-profile');
+        profile.innerHTML = name.charAt(0).toUpperCase();
+        profile.title = username;
+    }
+}
+
+async function login() {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const response = await fetch(`${SCRIPT_URL}?action=login&username=${username}&email=${email}`);
+    const data = await response.json();
+    if (data.success) {
+        localStorage.setItem('username', username);
+        localStorage.setItem('name', data.name);
+        localStorage.setItem('userId', data.userId);
+        window.location.href = 'index.html';
+    } else {
+        alert('Login failed');
+    }
+}
+
+async function signup() {
+    const name = document.getElementById('name').value;
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const response = await fetch(`${SCRIPT_URL}?action=signup&name=${name}&username=${username}&email=${email}`);
+    const data = await response.json();
+    if (data.success) {
+        localStorage.setItem('username', username);
+        localStorage.setItem('name', name);
+        localStorage.setItem('userId', data.userId);
+        window.location.href = 'index.html';
+    } else {
+        alert('Signup failed: ' + data.message);
+    }
+}
+
+async function loadLatestArticles() {
+    const response = await fetch(`${SCRIPT_URL}?action=getLatestArticles`);
+    const articles = await response.json();
+    const list = document.getElementById('latest-list');
+    list.innerHTML = '';
+    articles.forEach(article => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="article.html?title=${encodeURIComponent(article.title)}">${article.title}</a>`;
+        list.appendChild(li);
+    });
+}
+
+async function loadArticlesByCategory(category) {
+    const response = await fetch(`${SCRIPT_URL}?action=getArticlesByCategory&category=${category}`);
+    const articles = await response.json();
+    // Display in a new section or modal, for simplicity alert
+    alert(articles.map(a => a.title).join('\n'));
+}
+
+async function searchArticles() {
+    const query = document.getElementById('search-bar').value;
+    const response = await fetch(`${SCRIPT_URL}?action=searchArticles&query=${query}`);
+    const articles = await response.json();
+    // Similar to above, display results
+    alert(articles.map(a => a.title).join('\n'));
+}
+
+async function loadArticle(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
+    const article = await response.json();
+    document.getElementById('article-title').textContent = article.title;
+    // Parse content for infobox and links
+    const content = article.content.replace(/\[\[([^\]]+)\]\]/g, '<a href="article.html?title=$1">$1</a>');
+    const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
+    if (infoboxMatch) {
+        document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
+    }
+    document.getElementById('article-content').innerHTML = content.replace(/{{Infobox(.*?)}}/s, '');
+}
+
+function parseInfobox(content) {
+    // Simple parsing, convert |key=value to table
+    const lines = content.split('|');
+    let html = '<table>';
+    lines.forEach(line => {
+        if (line.includes('=')) {
+            const [key, value] = line.split('=');
+            html += `<tr><th>${key.trim()}</th><td>${value.trim()}</td></tr>`;
+        }
+    });
+    html += '</table>';
+    return html;
+}
+
+async function loadArticleForEdit(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getArticle&title=${title}`);
+    const article = await response.json();
+    document.getElementById('title').value = article.title;
+    document.getElementById('content').value = article.content;
+}
+
+async function loadEditHistory(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getEditHistory&title=${title}`);
+    const history = await response.json();
+    const list = document.getElementById('history-list');
+    list.innerHTML = '';
+    history.forEach(edit => {
+        const li = document.createElement('li');
+        li.textContent = `${edit.date} by ${edit.editor}: ${edit.summary}`;
+        list.appendChild(li);
+    });
+}
+
+async function loadComments(title) {
+    const response = await fetch(`${SCRIPT_URL}?action=getComments&title=${title}`);
+    const comments = await response.json();
+    const list = document.getElementById('comments-list');
+    list.innerHTML = '';
+    comments.forEach(comment => {
+        const li = document.createElement('li');
+        li.textContent = `${comment.date} by ${comment.commenter}: ${comment.comment}`;
+        list.appendChild(li);
+    });
+}
+
+async function submitComment() {
+    const title = document.getElementById('article-title').textContent;
+    const comment = document.getElementById('new-comment').value;
+    const userId = localStorage.getItem('userId');
+    if (!userId) return alert('Login required');
+    const response = await fetch(`${SCRIPT_URL}?action=addComment&title=${title}&comment=${comment}&authorId=${userId}`, {method: 'POST'});
+    const data = await response.json();
+    if (data.success) {
+        loadComments(title);
+    }
+}
+
+async function submitArticle() {
+    const title = document.getElementById('title').value;
+    const category = document.getElementById('category').value;
+    const content = document.getElementById('content').value;
+    const userId = localStorage.getItem('userId');
+    const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${title}&category=${category}&content=${content}&authorId=${userId}`, {method: 'POST'});
+    const data = await response.json();
+    if (data.success) {
+        window.location.href = `article.html?title=${encodeURIComponent(title)}`;
+    } else {
+        alert('Submit failed: ' + data.message);
+    }
+}
+
+async function editArticle() {
+    const title = document.getElementById('title').value;
+    const content = document.getElementById('content').value;
+    const summary = document.getElementById('summary').value;
+    const userId = localStorage.getItem('userId');
+    const response = await fetch(`${SCRIPT_URL}?action=editArticle&title=${title}&content=${content}&summary=${summary}&editorId=${userId}`, {method: 'POST'});
+    const data = await response.json();
+    if (data.success) {
+        window.location.href = `article.html?title=${encodeURIComponent(title)}`;
+    }
+}
+
+function loadTemplate() {
+    const category = document.getElementById('category').value;
+    const template = TEMPLATES[category] || '';
+    document.getElementById('content').value = template;
+}
+// templates.js
+const TEMPLATES = {
+    'Villages': '{{Infobox\n|name = \n|district = \n|population = \n}}\n\n==History==\n\n==Geography==\n\n[[Link to related article]]',
+    'Districts': '{{Infobox\n|name = \n|capital = \n|area = \n}}\n\n==Overview==\n\n==Economy==\n',
+    'Famous People': '{{Infobox\n|name = \n|birth_date = \n|occupation = \n}}\n\n==Biography==\n\n==Achievements==\n',
+    'Colleges': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Courses==\n\n==Facilities==\n',
+    'Schools': '{{Infobox\n|name = \n|established = \n|location = \n}}\n\n==Curriculum==\n\n==Extracurricular==\n',
+    'Mosques': '{{Infobox\n|name = \n|built = \n|location = \n}}\n\n==Architecture==\n\n==History==\n'
+};
+// config.js
+const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_APPS_SCRIPT_ID/exec'; // Replace with your deployed Apps Script URL
+// backend/Code.gs (Google Apps Script)
+// Deploy as Web App, execute as 'Me', access 'Anyone'
+
+// Sheets: Create a Google Sheet with tabs: Users, Articles, Revisions, Comments, Categories
+
+function getArticleId(title) {
+  const sheetApp = SpreadsheetApp.getActiveSpreadsheet();
+  const articlesSheet = sheetApp.getSheetByName('Articles');
+  const data = articlesSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][2] === title) {
+      return data[i][0];
+    }
+  }
+  return null;
+}
+
+function getUserName(userId) {
+  const sheetApp = SpreadsheetApp.getActiveSpreadsheet();
+  const usersSheet = sheetApp.getSheetByName('Users');
+  const data = usersSheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][0] === userId) {
+      return data[i][2]; // username
+    }
+  }
+  return 'Unknown';
+}
+
+function doGet(e) {
+  const action = e.parameter.action;
+  const sheetApp = SpreadsheetApp.getActiveSpreadsheet();
+
+  if (action === 'login') {
+    const username = e.parameter.username;
+    const email = e.parameter.email;
+    const usersSheet = sheetApp.getSheetByName('Users');
+    const data = usersSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] === username && data[i][1] === email) {
+        return ContentService.createTextOutput(JSON.stringify({success: true, name: data[i][3], userId: data[i][0]})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({success: false})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'signup') {
+    const name = e.parameter.name;
+    const username = e.parameter.username;
+    const email = e.parameter.email;
+    const usersSheet = sheetApp.getSheetByName('Users');
+    const data = usersSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] === username) {
+        return ContentService.createTextOutput(JSON.stringify({success: false, message: 'Username exists'})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    const id = Utilities.getUuid();
+    usersSheet.appendRow([id, email, username, name, new Date()]);
+    return ContentService.createTextOutput(JSON.stringify({success: true, userId: id})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'getLatestArticles') {
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    let articles = data.slice(1).map(row => ({title: row[2], category: row[3], createdAt: row[5]}));
+    articles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    articles = articles.slice(0, 5).map(a => ({title: a.title, category: a.category}));
+    return ContentService.createTextOutput(JSON.stringify(articles)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'getArticlesByCategory') {
+    const category = e.parameter.category;
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    const articles = data.slice(1).filter(row => row[3] === category).map(row => ({title: row[2]}));
+    return ContentService.createTextOutput(JSON.stringify(articles)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'searchArticles') {
+    const query = e.parameter.query.toLowerCase();
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    const articles = data.slice(1).filter(row => row[2].toLowerCase().includes(query)).map(row => ({title: row[2]}));
+    return ContentService.createTextOutput(JSON.stringify(articles)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'getArticle') {
+    const title = e.parameter.title;
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] === title) {
+        return ContentService.createTextOutput(JSON.stringify({title: data[i][2], content: data[i][8]})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'getEditHistory') {
+    const title = e.parameter.title;
+    const articleId = getArticleId(title);
+    if (!articleId) {
+      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    }
+    const revisionsSheet = sheetApp.getSheetByName('Revisions');
+    const data = revisionsSheet.getDataRange().getValues();
+    const history = data.slice(1).filter(row => row[1] === articleId).map(row => ({
+      date: row[5],
+      editor: getUserName(row[2]),
+      summary: row[3]
+    }));
+    return ContentService.createTextOutput(JSON.stringify(history)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'getComments') {
+    const title = e.parameter.title;
+    const articleId = getArticleId(title);
+    if (!articleId) {
+      return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+    }
+    const commentsSheet = sheetApp.getSheetByName('Comments');
+    const data = commentsSheet.getDataRange().getValues();
+    const comments = data.slice(1).filter(row => row[1] === articleId).map(row => ({
+      date: row[4],
+      commenter: getUserName(row[2]),
+      comment: row[3]
+    }));
+    return ContentService.createTextOutput(JSON.stringify(comments)).setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doPost(e) {
+  const action = e.parameter.action;
+  const sheetApp = SpreadsheetApp.getActiveSpreadsheet();
+
+  if (action === 'submitArticle') {
+    const title = e.parameter.title;
+    const category = e.parameter.category;
+    const content = e.parameter.content;
+    const authorId = e.parameter.authorId;
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] === title) {
+        return ContentService.createTextOutput(JSON.stringify({success: false, message: 'Title exists'})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    const id = Utilities.getUuid();
+    const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+    const createdAt = new Date();
+    const updatedAt = createdAt;
+    const contentJson = '';
+    const contentText = content;
+    const categories = category;
+    articlesSheet.appendRow([id, slug, title, category, authorId, createdAt, updatedAt, contentJson, contentText, categories]);
+    const revisionsSheet = sheetApp.getSheetByName('Revisions');
+    const revId = Utilities.getUuid();
+    revisionsSheet.appendRow([revId, id, authorId, 'Initial creation', contentText, createdAt]);
+    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'editArticle') {
+    const title = e.parameter.title;
+    const content = e.parameter.content;
+    const summary = e.parameter.summary;
+    const editorId = e.parameter.editorId;
+    const articlesSheet = sheetApp.getSheetByName('Articles');
+    const data = articlesSheet.getDataRange().getValues();
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][2] === title) {
+        articlesSheet.getRange(i + 1, 7).setValue(new Date());
+        articlesSheet.getRange(i + 1, 9).setValue(content);
+        const revisionsSheet = sheetApp.getSheetByName('Revisions');
+        const revId = Utilities.getUuid();
+        const articleId = data[i][0];
+        const createdAt = new Date();
+        revisionsSheet.appendRow([revId, articleId, editorId, summary, content, createdAt]);
+        return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify({success: false})).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  if (action === 'addComment') {
+    const title = e.parameter.title;
+    const comment = e.parameter.comment;
+    const authorId = e.parameter.authorId;
+    const articleId = getArticleId(title);
+    if (!articleId) {
+      return ContentService.createTextOutput(JSON.stringify({success: false})).setMimeType(ContentService.MimeType.JSON);
+    }
+    const commentsSheet = sheetApp.getSheetByName('Comments');
+    const comId = Utilities.getUuid();
+    const createdAt = new Date();
+    commentsSheet.appendRow([comId, articleId, authorId, comment, createdAt]);
+    return ContentService.createTextOutput(JSON.stringify({success: true})).setMimeType(ContentService.MimeType.JSON);
+  }
+}
