@@ -16,6 +16,7 @@ function checkLogin() {
         const profile = document.getElementById('user-profile');
         profile.innerHTML = name.charAt(0).toUpperCase();
         profile.title = username;
+        profile.setAttribute('tooltip', username);
     }
 }
 
@@ -32,7 +33,7 @@ async function login() {
             localStorage.setItem('userId', data.userId);
             window.location.href = 'index.html';
         } else {
-            alert('Login failed');
+            alert('Login failed: Invalid username or email');
         }
     } catch (error) {
         alert('Error during login: ' + error.message);
@@ -111,32 +112,40 @@ async function searchArticles() {
 }
 
 function parseWikiText(content, idMap) {
-    let html = content;
+    let html = content.trim();
     // Convert ==Section== to <h2>Section</h2>
-    html = html.replace(/^==\s*([^=\n]+)\s*==$/gm, '<h2>$1</h2>');
+    html = html.replace(/^==\s*([^\n=]+?)\s*==$/gm, '<h2>$1</h2>');
     // Convert ===Subsection=== to <h3>Subsection</h3>
-    html = html.replace(/^===\s*([^=\n]+)\s*===$/gm, '<h3>$1</h3>');
+    html = html.replace(/^===\s*([^\n=]+?)\s*===$/gm, '<h3>$1</h3>');
     // Convert '''bold''' to <strong>bold</strong>
-    html = html.replace(/'''([^']+)'''/g, '<strong>$1</strong>');
+    html = html.replace(/'''([^']+?)'''/g, '<strong>$1</strong>');
     // Convert ''italic'' to <em>italic</em>
-    html = html.replace(/''([^']+)''/g, '<em>$1</em>');
+    html = html.replace(/''([^']+?)''/g, '<em>$1</em>');
     // Convert * Item to <ul><li>Item</li></ul>
-    let listOpen = false;
+    let listLevel = 0;
     html = html.split('\n').map(line => {
-        if (line.match(/^\*\s*(.+)$/)) {
-            if (!listOpen) {
-                listOpen = true;
-                return `<ul><li>${line.replace(/^\*\s*(.+)$/, '$1')}</li>`;
+        const listMatch = line.match(/^\*+\s*(.+)$/);
+        if (listMatch) {
+            const level = line.match(/^\*+/)[0].length;
+            const item = listMatch[1];
+            let result = '';
+            if (level > listLevel) {
+                result += '<ul>'.repeat(level - listLevel);
+            } else if (level < listLevel) {
+                result += '</ul>'.repeat(listLevel - level);
             }
-            return `<li>${line.replace(/^\*\s*(.+)$/, '$1')}</li>`;
-        } else if (listOpen) {
-            listOpen = false;
-            return `</ul>${line}`;
+            result += `<li>${item}</li>`;
+            listLevel = level;
+            return result;
+        } else if (listLevel > 0) {
+            const closing = '</ul>'.repeat(listLevel);
+            listLevel = 0;
+            return closing + (line.trim() ? `<p>${line}</p>` : '');
         }
-        return line;
+        return line.trim() ? `<p>${line}</p>` : '';
     }).join('\n');
-    if (listOpen) {
-        html += '</ul>';
+    if (listLevel > 0) {
+        html += '</ul>'.repeat(listLevel);
     }
     // Automatically link article titles
     for (const [title, titleId] of Object.entries(idMap)) {
@@ -144,16 +153,9 @@ function parseWikiText(content, idMap) {
         html = html.replace(regex, `<a href="article.html?id=${encodeURIComponent(titleId)}">${title}</a>`);
     }
     // Convert [[Link]] to <a href="article.html?id=ID">Link</a>
-    html = html.replace(/\[\[([^\]]+)\]\]/g, (match, title) => {
+    html = html.replace(/\[\[([^\]]+?)\]\]/g, (match, title) => {
         return `<a href="article.html?id=${encodeURIComponent(idMap[title] || '')}">${title}</a>`;
     });
-    // Wrap non-heading/list lines in <p> tags
-    html = html.split('\n').map(line => {
-        if (!line.match(/^(<h[23]|<ul>|<li>|<\/ul>)/) && line.trim()) {
-            return `<p>${line}</p>`;
-        }
-        return line;
-    }).join('');
     return html;
 }
 
@@ -168,12 +170,12 @@ async function loadArticle(id) {
         document.getElementById('article-title').textContent = article.title;
         document.getElementById('page-title').textContent = `Kashurpedia - ${article.title}`;
         let content = article.content;
-        const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
+        const infoboxMatch = content.match(/{{Infobox\s*\|(.*?)}}/s);
         if (infoboxMatch) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1]);
-            content = content.replace(/{{Infobox(.*?)}}/s, '');
+            content = content.replace(/{{Infobox\s*\|(.*?)}}/s, '');
         }
-        const citationMatches = content.match(/{{Cite(.*?)}}/gs) || [];
+        const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
         const citations = citationMatches.map(match => {
             const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
             const citation = {};
@@ -184,13 +186,14 @@ async function loadArticle(id) {
             return citation;
         });
         content = parseWikiText(content, article.idMap);
-        content = content.replace(/{{Cite(.*?)}}/g, (match, index) => `<sup>[${citationMatches.indexOf(match) + 1}]</sup>`);
+        content = content.replace(/{{Cite\s*\|(.*?)}}/g, (match, index) => `<sup title="Citation ${citationMatches.indexOf(match) + 1}">[${citationMatches.indexOf(match) + 1}]</sup>`);
         document.getElementById('article-content').innerHTML = content;
         const citationList = document.getElementById('citations-list');
         citationList.innerHTML = '';
         citations.forEach((citation, index) => {
             const li = document.createElement('li');
             li.innerHTML = citation.url ? `<a href="${citation.url}" target="_blank">${citation.title || 'Source'}</a> (${citation.author || 'Unknown'}, ${citation.date || 'No date'})` : `${citation.title || 'Source'} (${citation.author || 'Unknown'}, ${citation.date || 'No date'})`;
+            li.setAttribute('tooltip', `Citation ${index + 1}`);
             citationList.appendChild(li);
         });
     } catch (error) {
@@ -205,68 +208,117 @@ function parseInfobox(content) {
     let html = '<table>';
     lines.forEach(line => {
         const [key, value] = line.split('=').map(s => s.trim());
-        html += `<tr><th>${key}:</th><td>${value}</td></tr>`;
+        if (key && value) {
+            html += `<tr><th>${key}:</th><td>${value}</td></tr>`;
+        }
     });
     html += '</table>';
     return html;
 }
 
-function validateContent(content, category) {
+function validateContent(content, category, selectedOptions) {
     const errors = [];
-    // Check for Infobox
-    if (!content.match(/{{Infobox\s*\|/)) {
-        errors.push('Missing {{Infobox}} template. Include an Infobox with required fields.');
-    } else {
-        const infoboxMatch = content.match(/{{Infobox(.*?)}}/s);
+    if (!selectedOptions) return errors;
+    if (selectedOptions.infobox && !content.match(/{{Infobox\s*\|/)) {
+        errors.push('Missing {{Infobox}} template. Include an Infobox with selected fields.');
+    } else if (selectedOptions.infobox) {
+        const infoboxMatch = content.match(/{{Infobox\s*\|(.*?)}}/s);
         if (infoboxMatch) {
             const fields = infoboxMatch[1].split('|').filter(line => line.includes('=')).map(line => line.split('=')[0].trim());
-            const requiredFields = {
-                'Villages': ['name', 'district', 'population'],
-                'Districts': ['name', 'capital', 'area'],
-                'Famous People': ['name', 'birth_date', 'occupation'],
-                'Colleges': ['name', 'established', 'location'],
-                'Schools': ['name', 'established', 'location'],
-                'Mosques': ['name', 'built', 'location']
-            }[category];
-            for (const field of requiredFields) {
+            for (const field of selectedOptions.infoboxFields || []) {
                 if (!fields.includes(field)) {
-                    errors.push(`Missing required Infobox field: ${field}`);
+                    errors.push(`Missing selected Infobox field: ${field}`);
                 }
             }
         }
     }
-    // Check for References section
-    if (!content.match(/^==\s*References\s*==$/m)) {
-        errors.push('Missing ==References== section. Add a References section with at least one {{Cite}} template.');
+    if (selectedOptions.citations && !content.match(/{{Cite\s*\|/)) {
+        errors.push('Missing {{Cite}} template. Add at least one citation if selected.');
     }
-    // Check for valid Cite templates
-    const citationMatches = content.match(/{{Cite(.*?)}}/gs) || [];
-    citationMatches.forEach((match, index) => {
-        const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
-        const citation = {};
-        params.forEach(param => {
-            const [key, value] = param.split('=').map(s => s.trim());
-            citation[key] = value;
+    if (selectedOptions.citations) {
+        const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
+        citationMatches.forEach((match, index) => {
+            const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+            const citation = {};
+            params.forEach(param => {
+                const [key, value] = param.split('=').map(s => s.trim());
+                citation[key] = value;
+            });
+            if (!citation.title) {
+                errors.push(`Citation ${index + 1} missing title. Use |title= in {{Cite}} template.`);
+            }
         });
-        if (!citation.title) {
-            errors.push(`Citation ${index + 1} missing title. Use |title= in {{Cite}} template.`);
-        }
-    });
-    // Check for required sections
-    const requiredSections = {
-        'Villages': ['History', 'Geography', 'References'],
-        'Districts': ['Overview', 'Economy', 'References'],
-        'Famous People': ['Biography', 'Achievements', 'References'],
-        'Colleges': ['Courses', 'Facilities', 'References'],
-        'Schools': ['Curriculum', 'Extracurricular', 'References'],
-        'Mosques': ['Architecture', 'History', 'References']
-    }[category];
-    for (const section of requiredSections) {
+    }
+    for (const section of selectedOptions.sections || []) {
         if (!content.match(new RegExp(`^==\\s*${section}\\s*==$`, 'm'))) {
-            errors.push(`Missing required section: ==${section}==`);
+            errors.push(`Missing selected section: ==${section}==`);
         }
     }
     return errors;
+}
+
+function loadTemplateOptions() {
+    const category = document.getElementById('category').value;
+    const optionsContainer = document.getElementById('template-options');
+    optionsContainer.innerHTML = '';
+    const template = TEMPLATES[category] || {};
+    const infoboxFields = template.infoboxFields || [];
+    const sections = template.sections || [];
+    const optionsHtml = `
+        <div class="template-option">
+            <label><input type="checkbox" id="include-infobox" checked> Include Infobox</label>
+            <div id="infobox-fields" style="margin-left: 1.5rem; margin-top: 0.5rem;"></div>
+        </div>
+        <div class="template-option">
+            <label><input type="checkbox" id="include-sections" checked> Include Sections</label>
+            <div id="section-options" style="margin-left: 1.5rem; margin-top: 0.5rem;"></div>
+        </div>
+        <div class="template-option">
+            <label><input type="checkbox" id="include-citations" checked> Include Citations</label>
+        </div>
+    `;
+    optionsContainer.innerHTML = optionsHtml;
+    const infoboxFieldsContainer = document.getElementById('infobox-fields');
+    infoboxFields.forEach(field => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="checkbox" name="infobox-field" value="${field}" checked> ${field}`;
+        infoboxFieldsContainer.appendChild(label);
+    });
+    const sectionsContainer = document.getElementById('section-options');
+    sections.forEach(section => {
+        const label = document.createElement('label');
+        label.innerHTML = `<input type="checkbox" name="section" value="${section}" checked> ${section}`;
+        sectionsContainer.appendChild(label);
+    });
+}
+
+function generateTemplate() {
+    const category = document.getElementById('category').value;
+    const includeInfobox = document.getElementById('include-infobox').checked;
+    const infoboxFields = Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value);
+    const includeSections = document.getElementById('include-sections').checked;
+    const sections = Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value);
+    const includeCitations = document.getElementById('include-citations').checked;
+    let template = '';
+    if (includeInfobox && infoboxFields.length > 0) {
+        template += '{{Infobox\n';
+        infoboxFields.forEach(field => {
+            template += `|${field} = \n`;
+        });
+        template += '}}\n\n';
+    }
+    if (includeSections && sections.length > 0) {
+        sections.forEach(section => {
+            template += `==${section}==\n\n`;
+        });
+    }
+    if (includeCitations) {
+        template += '==References==\n{{Cite|title=|author=|url=|date=}}\n';
+    }
+    const content = document.getElementById('content');
+    if (!content.value || confirm('Generate template? This will overwrite current content.')) {
+        content.value = template;
+    }
 }
 
 async function loadArticleForEdit(id) {
@@ -280,6 +332,7 @@ async function loadArticleForEdit(id) {
         document.getElementById('title').value = article.title;
         document.getElementById('content').value = article.content;
         document.getElementById('category').value = article.category;
+        loadTemplateOptions();
     } catch (error) {
         alert('Error loading article for edit: ' + error.message);
     } finally {
@@ -297,6 +350,7 @@ async function loadEditHistory(id) {
         history.forEach(edit => {
             const li = document.createElement('li');
             li.textContent = `${edit.date} by ${edit.editor}: ${edit.summary}`;
+            li.setAttribute('tooltip', `Edit on ${edit.date}`);
             list.appendChild(li);
         });
     } catch (error) {
@@ -316,6 +370,7 @@ async function loadComments(id) {
         comments.forEach(comment => {
             const li = document.createElement('li');
             li.textContent = `${comment.date} by ${comment.commenter}: ${comment.comment}`;
+            li.setAttribute('tooltip', `Posted on ${comment.date}`);
             list.appendChild(li);
         });
     } catch (error) {
@@ -331,12 +386,17 @@ async function submitComment() {
     const comment = document.getElementById('new-comment').value;
     const userId = localStorage.getItem('userId');
     if (!userId) {
-        alert('Login required');
+        alert('Login required to comment');
+        hideLoading();
+        return;
+    }
+    if (!comment.trim()) {
+        alert('Comment cannot be empty');
         hideLoading();
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=addComment&id=${id}&comment=${comment}&authorId=${userId}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=addComment&id=${id}&comment=${encodeURIComponent(comment)}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             loadComments(id);
@@ -357,14 +417,20 @@ async function submitArticle() {
     const category = document.getElementById('category').value;
     const content = document.getElementById('content').value;
     const userId = localStorage.getItem('userId');
-    const errors = validateContent(content, category);
+    const selectedOptions = {
+        infobox: document.getElementById('include-infobox').checked,
+        infoboxFields: Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value),
+        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
+        citations: document.getElementById('include-citations').checked
+    };
+    const errors = validateContent(content, category, selectedOptions);
     if (errors.length > 0) {
         alert('Submission errors:\n- ' + errors.join('\n- '));
         hideLoading();
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${title}&category=${category}&content=${content}&authorId=${userId}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=submitArticle&title=${encodeURIComponent(title)}&category=${category}&content=${encodeURIComponent(content)}&authorId=${userId}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             window.location.href = `article.html?id=${encodeURIComponent(data.articleId)}`;
@@ -386,14 +452,20 @@ async function editArticle() {
     const summary = document.getElementById('summary').value;
     const category = document.getElementById('category').value;
     const userId = localStorage.getItem('userId');
-    const errors = validateContent(content, category);
+    const selectedOptions = {
+        infobox: document.getElementById('include-infobox').checked,
+        infoboxFields: Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value),
+        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
+        citations: document.getElementById('include-citations').checked
+    };
+    const errors = validateContent(content, category, selectedOptions);
     if (errors.length > 0) {
         alert('Submission errors:\n- ' + errors.join('\n- '));
         hideLoading();
         return;
     }
     try {
-        const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&content=${content}&summary=${summary}&editorId=${userId}&category=${category}`, {method: 'POST'});
+        const response = await fetch(`${SCRIPT_URL}?action=editArticle&id=${id}&content=${encodeURIComponent(content)}&summary=${encodeURIComponent(summary)}&editorId=${userId}&category=${category}`, {method: 'POST'});
         const data = await response.json();
         if (data.success) {
             window.location.href = `article.html?id=${encodeURIComponent(id)}`;
@@ -404,14 +476,5 @@ async function editArticle() {
         alert('Error editing article: ' + error.message);
     } finally {
         hideLoading();
-    }
-}
-
-function loadTemplate() {
-    const category = document.getElementById('category').value;
-    const template = TEMPLATES[category] || '';
-    const content = document.getElementById('content');
-    if (!content.value || confirm('Load template? This will overwrite current content.')) {
-        content.value = template;
     }
 }
