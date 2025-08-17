@@ -1,4 +1,3 @@
-// app.js
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
 }
@@ -130,6 +129,8 @@ async function searchArticles() {
 
 function parseWikiText(content, idMap) {
     let html = content.trim();
+    // Remove any {{Cite}} templates to avoid rendering issues
+    html = html.replace(/{{Cite\s*\|[^}]*}}/gs, '');
     // Convert ==Section== to collapsible heading
     html = html.replace(/^==\s*([^\n=]+?)\s*==$/gm, (match, title) => `
         <div class="mw-heading mw-heading2 section-heading collapsible-heading open-block" role="button" tabindex="0">
@@ -207,41 +208,8 @@ async function loadArticle(id) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1], article.category);
             content = content.replace(/{{Infobox\s*\|(.*?)}}/s, '');
         }
-        const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
-        const citations = citationMatches.map(match => {
-            const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
-            const citation = {};
-            params.forEach(param => {
-                const [key, value] = param.split('=').map(s => s.trim());
-                citation[key] = value;
-            });
-            return citation;
-        });
         content = parseWikiText(content, article.idMap);
-        content = content.replace(/{{Cite\s*\|(.*?)}}/g, (match, index) => `<sup class="reference" title="Citation ${citationMatches.indexOf(match) + 1}"><a href="#cite_note-${citationMatches.indexOf(match) + 1}">[${citationMatches.indexOf(match) + 1}]</a></sup>`);
         document.getElementById('article-content').innerHTML = content;
-        const citationList = document.createElement('ol');
-        citationList.id = 'cite-references';
-        citationList.style.margin = '1em 0 1em 2em';
-        citations.forEach((citation, index) => {
-            const li = document.createElement('li');
-            li.id = `cite_note-${index + 1}`;
-            li.innerHTML = citation.url ? `<a href="${citation.url}" target="_blank">${citation.title || 'Source'}</a> (${citation.author || 'Unknown'}, ${citation.date || 'No date'})` : `${citation.title || 'Source'} (${citation.author || 'Unknown'}, ${citation.date || 'No date'})`;
-            citationList.appendChild(li);
-        });
-        if (citations.length > 0) {
-            const refSection = document.createElement('div');
-            refSection.className = 'mw-heading mw-heading2 section-heading collapsible-heading open-block';
-            refSection.innerHTML = `
-                <span class="mf-icon mf-icon-expand mf-icon--small indicator"></span>
-                <h2 id="References">References</h2>
-            `;
-            const refContent = document.createElement('section');
-            refContent.className = 'mf-section-0 collapsible-block collapsible-block-js open-block';
-            refContent.appendChild(citationList);
-            document.getElementById('article-content').appendChild(refSection);
-            document.getElementById('article-content').appendChild(refContent);
-        }
     } catch (error) {
         alert('Error loading article: ' + error.message);
     } finally {
@@ -300,22 +268,6 @@ function validateContent(content, category, selectedOptions) {
             }
         }
     }
-    if (selectedOptions.citations && !content.match(/{{Cite\s*\|[^}]*title\s*=/i)) {
-        errors.push('Missing valid {{Cite}} template with |title=. Add at least one citation with a title.');
-    } else if (selectedOptions.citations) {
-        const citationMatches = content.match(/{{Cite\s*\|([^}]*)}}/gs) || [];
-        citationMatches.forEach((match, index) => {
-            const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
-            const citation = {};
-            params.forEach(param => {
-                const [key, value] = param.split('=').map(s => s.trim());
-                citation[key.toLowerCase()] = value;
-            });
-            if (!citation.title || citation.title.trim() === '') {
-                errors.push(`Citation ${index + 1} is missing a valid |title=.`);
-            }
-        });
-    }
     for (const section of selectedOptions.sections || []) {
         if (!content.match(new RegExp(`^==\\s*${section}\\s*==$`, 'm'))) {
             errors.push(`Missing selected section: ==${section}==`);
@@ -340,23 +292,6 @@ function loadTemplateOptions() {
         .filter(line => line.includes('='))
         .map(line => line.split('=')[0].trim()) : [];
     const existingSections = content.match(/^==\s*([^\n=]+?)\s*==$/gm)?.map(match => match.replace(/^==\s*|\s*==$/g, '')) || [];
-    const hasCitations = content.match(/{{Cite\s*\|[^}]*title\s*=/i);
-
-    // Populate citation fields with existing citations
-    const citationMatches = content.match(/{{Cite\s*\|([^}]*)}}/gs) || [];
-    const citations = citationMatches.map(match => {
-        const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
-        const citation = {};
-        params.forEach(param => {
-            const [key, value] = param.split('=').map(s => s.trim());
-            citation[key.toLowerCase()] = value;
-        });
-        return citation;
-    });
-    const citationLinks = citations.map(c => c.url || '').join(', ');
-    const citationTitles = citations.map(c => c.title || '').join(', ');
-    const citationAuthors = citations.map(c => c.author || '').join(', ');
-    const citationDates = citations.map(c => c.date || '').join(', ');
 
     const optionsHtml = `
         <div class="template-option">
@@ -366,19 +301,6 @@ function loadTemplateOptions() {
         <div class="template-option">
             <label><input type="checkbox" id="include-sections" ${existingSections.length > 0 ? 'checked' : ''}> Include Sections</label>
             <div id="section-options" style="margin-left: 1.5rem; margin-top: 0.5rem;"></div>
-        </div>
-        <div class="template-option">
-            <label><input type="checkbox" id="include-citations" ${hasCitations ? 'checked' : ''}> Include Citations</label>
-            <div id="citation-options" style="margin-left: 1.5rem; margin-top: 0.5rem;">
-                <label for="citation-links">Links (comma-separated):</label>
-                <input type="text" id="citation-links" value="${citationLinks}" placeholder="e.g., https://example.com, https://example2.com">
-                <label for="citation-titles">Titles (comma-separated):</label>
-                <input type="text" id="citation-titles" value="${citationTitles}" placeholder="e.g., Article Title 1, Article Title 2">
-                <label for="citation-authors">Authors (comma-separated):</label>
-                <input type="text" id="citation-authors" value="${citationAuthors}" placeholder="e.g., Author 1, Author 2">
-                <label for="citation-dates">Dates (comma-separated):</label>
-                <input type="text" id="citation-dates" value="${citationDates}" placeholder="e.g., 2025-08-17, 2025-08-18">
-            </div>
         </div>
     `;
     optionsContainer.innerHTML = optionsHtml;
@@ -404,17 +326,6 @@ function generateTemplate() {
     const infoboxFields = Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value);
     const includeSections = document.getElementById('include-sections').checked;
     const sections = Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value);
-    const includeCitations = document.getElementById('include-citations').checked;
-    const citationLinks = document.getElementById('citation-links').value.split(',').map(s => s.trim()).filter(s => s);
-    const citationTitles = document.getElementById('citation-titles').value.split(',').map(s => s.trim()).filter(s => s);
-    const citationAuthors = document.getElementById('citation-authors').value.split(',').map(s => s.trim()).filter(s => s);
-    const citationDates = document.getElementById('citation-dates').value.split(',').map(s => s.trim()).filter(s => s);
-
-    // Validate citation inputs
-    if (includeCitations && citationTitles.length === 0) {
-        alert('At least one citation title is required when citations are included.');
-        return;
-    }
 
     const content = document.getElementById('content');
     let currentContent = content.value.trim();
@@ -435,19 +346,6 @@ function generateTemplate() {
         const newSections = sections.filter(section => !existingSections.includes(section));
         newSections.forEach(section => {
             template += `==${section}==\n\n`;
-        });
-    }
-
-    // Append citations if selected
-    if (includeCitations && citationTitles.length > 0) {
-        if (!currentContent.match(/^==\s*References\s*==$/m)) {
-            template += '==References==\n';
-        }
-        citationTitles.forEach((title, index) => {
-            const url = citationLinks[index] || '';
-            const author = citationAuthors[index] || '';
-            const date = citationDates[index] || '';
-            template += `{{Cite|title=${title}|author=${author}|url=${url}|date=${date}}}\n`;
         });
     }
 
@@ -557,8 +455,7 @@ async function submitArticle() {
     const selectedOptions = {
         infobox: document.getElementById('include-infobox').checked,
         infoboxFields: Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value),
-        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
-        citations: document.getElementById('include-citations').checked
+        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value)
     };
     if (shortDescription.length > 500) {
         alert('Short description must be under 500 characters');
@@ -598,8 +495,7 @@ async function editArticle() {
     const selectedOptions = {
         infobox: document.getElementById('include-infobox').checked,
         infoboxFields: Array.from(document.querySelectorAll('input[name="infobox-field"]:checked')).map(input => input.value),
-        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value),
-        citations: document.getElementById('include-citations').checked
+        sections: Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value)
     };
     if (shortDescription.length > 500) {
         alert('Short description must be under 500 characters');
