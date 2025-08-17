@@ -209,7 +209,7 @@ async function loadArticle(id) {
         }
         const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
         const citations = citationMatches.map(match => {
-            const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+            const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
             const citation = {};
             params.forEach(param => {
                 const [key, value] = param.split('=').map(s => s.trim());
@@ -300,20 +300,19 @@ function validateContent(content, category, selectedOptions) {
             }
         }
     }
-    if (selectedOptions.citations && !content.match(/{{Cite\s*\|/)) {
-        errors.push('Missing {{Cite}} template. Add at least one citation if selected.');
-    }
-    if (selectedOptions.citations) {
-        const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
+    if (selectedOptions.citations && !content.match(/{{Cite\s*\|[^}]*title\s*=/i)) {
+        errors.push('Missing valid {{Cite}} template with |title=. Add at least one citation with a title.');
+    } else if (selectedOptions.citations) {
+        const citationMatches = content.match(/{{Cite\s*\|([^}]*)}}/gs) || [];
         citationMatches.forEach((match, index) => {
-            const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+            const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
             const citation = {};
             params.forEach(param => {
                 const [key, value] = param.split('=').map(s => s.trim());
-                citation[key] = value;
+                citation[key.toLowerCase()] = value;
             });
-            if (!citation.title) {
-                errors.push(`Citation ${index + 1} missing title. Use |title= in {{Cite}} template.`);
+            if (!citation.title || citation.title.trim() === '') {
+                errors.push(`Citation ${index + 1} is missing a valid |title=.`);
             }
         });
     }
@@ -341,16 +340,16 @@ function loadTemplateOptions() {
         .filter(line => line.includes('='))
         .map(line => line.split('=')[0].trim()) : [];
     const existingSections = content.match(/^==\s*([^\n=]+?)\s*==$/gm)?.map(match => match.replace(/^==\s*|\s*==$/g, '')) || [];
-    const hasCitations = content.match(/{{Cite\s*\|/);
+    const hasCitations = content.match(/{{Cite\s*\|[^}]*title\s*=/i);
 
     // Populate citation fields with existing citations
-    const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
+    const citationMatches = content.match(/{{Cite\s*\|([^}]*)}}/gs) || [];
     const citations = citationMatches.map(match => {
-        const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+        const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
         const citation = {};
         params.forEach(param => {
             const [key, value] = param.split('=').map(s => s.trim());
-            citation[key] = value;
+            citation[key.toLowerCase()] = value;
         });
         return citation;
     });
@@ -410,6 +409,12 @@ function generateTemplate() {
     const citationTitles = document.getElementById('citation-titles').value.split(',').map(s => s.trim()).filter(s => s);
     const citationAuthors = document.getElementById('citation-authors').value.split(',').map(s => s.trim()).filter(s => s);
     const citationDates = document.getElementById('citation-dates').value.split(',').map(s => s.trim()).filter(s => s);
+
+    // Validate citation inputs
+    if (includeCitations && citationTitles.length === 0) {
+        alert('At least one citation title is required when citations are included.');
+        return;
+    }
 
     const content = document.getElementById('content');
     let currentContent = content.value.trim();
