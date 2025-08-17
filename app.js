@@ -129,8 +129,27 @@ async function searchArticles() {
 
 function parseWikiText(content, idMap) {
     let html = content.trim();
-    // Remove any {{Cite}} templates to avoid rendering issues
+    // Extract <ref> tags containing {{Cite}} templates
+    const refMatches = content.match(/<ref>{{Cite\s*\|([^}]*)}}<\/ref>/g) || [];
+    const references = refMatches.map((match, index) => {
+        const params = match.match(/\|([^=]+)=([^|]*)/g) || [];
+        const citation = {};
+        params.forEach(param => {
+            const [key, value] = param.split('=').map(s => s.trim());
+            citation[key.toLowerCase()] = value;
+        });
+        return { index: index + 1, title: citation.title || 'Source', url: citation.url || '', accessDate: citation['access-date'] || '' };
+    });
+
+    // Replace <ref> tags with superscript links
+    html = html.replace(/<ref>{{Cite\s*\|([^}]*)}}<\/ref>/g, (match, index) => {
+        const refIndex = refMatches.indexOf(match) + 1;
+        return `<sup class="reference"><a href="#cite_note-${refIndex}">[${refIndex}]</a></sup>`;
+    });
+
+    // Remove standalone {{Cite}} templates
     html = html.replace(/{{Cite\s*\|[^}]*}}/gs, '');
+
     // Convert ==Section== to collapsible heading
     html = html.replace(/^==\s*([^\n=]+?)\s*==$/gm, (match, title) => `
         <div class="mw-heading mw-heading2 section-heading collapsible-heading open-block" role="button" tabindex="0">
@@ -145,12 +164,16 @@ function parseWikiText(content, idMap) {
         </div>
         <section class="mf-section-0 collapsible-block collapsible-block-js open-block">
     `);
+
     // Convert ===Subsection=== to <h3>
     html = html.replace(/^===\s*([^\n=]+?)\s*===$/gm, '</section><h3>$1</h3>');
+
     // Convert '''bold''' to <strong>
     html = html.replace(/'''([^']+?)'''/g, '<strong>$1</strong>');
+
     // Convert ''italic'' to <em>
     html = html.replace(/''([^']+?)''/g, '<em>$1</em>');
+
     // Convert * Item to <ul><li>Item</li></ul>
     let listLevel = 0;
     html = html.split('\n').map(line => {
@@ -174,21 +197,26 @@ function parseWikiText(content, idMap) {
         }
         return line.trim() ? `<p>${line}</p>` : '';
     }).join('\n');
+
     if (listLevel > 0) {
         html += '</ul>'.repeat(listLevel);
     }
+
     // Close open sections
     html += '</section>';
+
     // Automatically link article titles
     for (const [title, titleId] of Object.entries(idMap)) {
         const regex = new RegExp(`\\b${title.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')}\\b(?![^\[]*\]\])`, 'g');
         html = html.replace(regex, `<a href="article.html?id=${encodeURIComponent(titleId)}">${title}</a>`);
     }
+
     // Convert [[Link]] to <a href="article.html?id=ID">Link</a>
     html = html.replace(/\[\[([^\]]+?)\]\]/g, (match, title) => {
         return `<a href="article.html?id=${encodeURIComponent(idMap[title] || '')}">${title}</a>`;
     });
-    return html;
+
+    return { html, references };
 }
 
 async function loadArticle(id) {
@@ -208,8 +236,32 @@ async function loadArticle(id) {
             document.getElementById('infobox').innerHTML = parseInfobox(infoboxMatch[1], article.category);
             content = content.replace(/{{Infobox\s*\|(.*?)}}/s, '');
         }
-        content = parseWikiText(content, article.idMap);
-        document.getElementById('article-content').innerHTML = content;
+        const { html, references } = parseWikiText(content, article.idMap);
+        document.getElementById('article-content').innerHTML = html;
+
+        // Add References section if references exist
+        if (references.length > 0) {
+            const refSection = document.createElement('div');
+            refSection.className = 'mw-heading mw-heading2 section-heading collapsible-heading open-block';
+            refSection.innerHTML = `
+                <span class="mf-icon mf-icon-expand mf-icon--small indicator"></span>
+                <h2 id="References">References</h2>
+            `;
+            const refContent = document.createElement('section');
+            refContent.className = 'mf-section-0 collapsible-block collapsible-block-js open-block';
+            const citationList = document.createElement('ol');
+            citationList.id = 'cite-references';
+            citationList.style.margin = '1em 0 1em 2em';
+            references.forEach(ref => {
+                const li = document.createElement('li');
+                li.id = `cite_note-${ref.index}`;
+                li.innerHTML = ref.url ? `<a href="${ref.url}" target="_blank">${ref.title}</a> (Accessed ${ref.accessDate || 'No date'})` : `${ref.title} (Accessed ${ref.accessDate || 'No date'})`;
+                citationList.appendChild(li);
+            });
+            refContent.appendChild(citationList);
+            document.getElementById('article-content').appendChild(refSection);
+            document.getElementById('article-content').appendChild(refContent);
+        }
     } catch (error) {
         alert('Error loading article: ' + error.message);
     } finally {
