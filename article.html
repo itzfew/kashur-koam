@@ -42,7 +42,7 @@
                 <li class="page-actions-menu__list-item" id="page-actions-edit">
                     <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet edit-page menu__item--page-actions-edit" href="#" id="edit-link" role="button" title="Edit">
                         <span class="minerva-icon minerva-icon--edit"></span>
-                        <span class="visually-hidden">Edit</span>
+                        <span class="visually-hidden">edit</span>
                     </a>
                 </li>
             </ul>
@@ -84,19 +84,6 @@
             loadArticle(id);
             document.getElementById('edit-link').href = `edit.html?id=${encodeURIComponent(id)}`;
             document.getElementById('talk-link').href = `talk.html?id=${encodeURIComponent(id)}`;
-            document.querySelectorAll('.collapsible-heading').forEach(header => {
-                header.addEventListener('click', () => {
-                    const section = header.nextElementSibling;
-                    const icon = header.querySelector('.mf-icon');
-                    if (section.classList.contains('open-block')) {
-                        section.classList.remove('open-block');
-                        icon.style.transform = 'scaleY(1)';
-                    } else {
-                        section.classList.add('open-block');
-                        icon.style.transform = 'scaleY(-1)';
-                    }
-                });
-            });
         });
     </script>
 </body>
