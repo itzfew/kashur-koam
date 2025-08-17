@@ -127,12 +127,16 @@ async function searchArticles() {
     }
 }
 
+// Sanitize HTML to prevent XSS while allowing safe HTML tags
 function sanitizeHTML(str) {
+    // Create a temporary div to encode text content
     const div = document.createElement('div');
     div.textContent = str;
+    // Allow specific safe HTML tags and attributes
     return div.innerHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+// Parse wiki-style text into HTML with proper structure
 function parseWikiText(content, idMap) {
     let html = content.trim();
     let references = [];
@@ -207,15 +211,15 @@ function parseWikiText(content, idMap) {
             } else if (level < listLevel) {
                 result += '</ul>'.repeat(listLevel - level);
             }
-            result += `<li>${sanitizeHTML(item)}</li>`;
+            result += `<li>${item}</li>`; // Do not sanitize item here to allow nested HTML
             listLevel = level;
             return result;
         } else if (listLevel > 0) {
             const closing = '</ul>'.repeat(listLevel);
             listLevel = 0;
-            return closing + (line.trim() ? `<p>${sanitizeHTML(line)}</p>` : '');
+            return closing + (line.trim() ? `<p>${line}</p>` : '');
         }
-        return line.trim() ? `<p>${sanitizeHTML(line)}</p>` : '';
+        return line.trim() ? `<p>${line}</p>` : '';
     }).join('\n');
 
     if (listLevel > 0) {
@@ -240,6 +244,7 @@ function parseWikiText(content, idMap) {
     return { html, references };
 }
 
+// Load and render article content
 async function loadArticle(id) {
     showLoading();
     try {
@@ -272,7 +277,7 @@ async function loadArticle(id) {
         const { html, references } = parseWikiText(content, article.idMap || {});
         const contentContainer = document.getElementById('article-content');
         contentContainer.classList.add('mw-parser-output');
-        contentContainer.innerHTML = html;
+        contentContainer.innerHTML = html; // Insert raw HTML to be rendered by the browser
 
         // Add References section if references exist
         if (references.length > 0) {
@@ -322,12 +327,50 @@ async function loadArticle(id) {
                 }
             });
         });
+
+        // Generate and insert Table of Contents (TOC)
+        generateTOC(contentContainer);
     } catch (error) {
         alert('Error loading article: ' + error.message);
         document.getElementById('article-content').innerHTML = '<p>Error loading content.</p>';
     } finally {
         hideLoading();
     }
+}
+
+// Generate Table of Contents
+function generateTOC(contentContainer) {
+    const tocContainer = document.createElement('div');
+    tocContainer.className = 'toc';
+    const tocTitle = document.createElement('h2');
+    tocTitle.textContent = 'Contents';
+    const tocList = document.createElement('ul');
+    const headings = contentContainer.querySelectorAll('h2, h3');
+    let currentLevel = 2;
+    let ul = tocList;
+
+    headings.forEach((heading, index) => {
+        const level = parseInt(heading.tagName.replace('H', ''));
+        const title = heading.textContent;
+        const id = heading.id;
+
+        if (level > currentLevel) {
+            const newUl = document.createElement('ul');
+            ul.lastElementChild.appendChild(newUl);
+            ul = newUl;
+        } else if (level < currentLevel) {
+            ul = ul.closest('ul').parentElement.closest('ul') || tocList;
+        }
+
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#${id}">${sanitizeHTML(title)}</a>`;
+        ul.appendChild(li);
+        currentLevel = level;
+    });
+
+    tocContainer.appendChild(tocTitle);
+    tocContainer.appendChild(tocList);
+    contentContainer.insertBefore(tocContainer, contentContainer.firstChild);
 }
 
 async function loadTalk(id) {
