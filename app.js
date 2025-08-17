@@ -1,3 +1,4 @@
+// app.js
 function showLoading() {
     document.getElementById('loading').style.display = 'flex';
 }
@@ -137,7 +138,7 @@ function parseWikiText(content, idMap) {
             <span class="mw-editsection">
                 <a class="cdx-button cdx-button--size-large cdx-button--fake-button cdx-button--icon-only cdx-button--weight-quiet" href="#" role="button" title="Edit section: ${title}">
                     <span class="minerva-icon minerva-icon--edit"></span>
-                    <span style="border: 0; clip: rect(1px, 1px, 1px, 1px); display: block; height: 1px; margin: -1px; overflow: hidden; padding: 0; position: absolute !important; width: 1px;">edit</span>
+                    <span class="visually-hidden">edit</span>
                 </a>
             </span>
         </div>
@@ -326,35 +327,74 @@ function validateContent(content, category, selectedOptions) {
 
 function loadTemplateOptions() {
     const category = document.getElementById('category').value;
+    const content = document.getElementById('content').value;
     const optionsContainer = document.getElementById('template-options');
     optionsContainer.innerHTML = '';
     const template = TEMPLATES[category] || {};
     const infoboxFields = template.infoboxFields || [];
     const sections = template.sections || [];
+
+    // Detect existing content
+    const hasInfobox = content.match(/{{Infobox\s*\|/);
+    const existingInfoboxFields = hasInfobox ? content.match(/{{Infobox\s*\|(.*?)}}/s)[1]
+        .split('|')
+        .filter(line => line.includes('='))
+        .map(line => line.split('=')[0].trim()) : [];
+    const existingSections = content.match(/^==\s*([^\n=]+?)\s*==$/gm)?.map(match => match.replace(/^==\s*|\s*==$/g, '')) || [];
+    const hasCitations = content.match(/{{Cite\s*\|/);
+
+    // Populate citation fields with existing citations
+    const citationMatches = content.match(/{{Cite\s*\|(.*?)}}/gs) || [];
+    const citations = citationMatches.map(match => {
+        const params = match.match(/\|([^=]+)=([^|]+)/g) || [];
+        const citation = {};
+        params.forEach(param => {
+            const [key, value] = param.split('=').map(s => s.trim());
+            citation[key] = value;
+        });
+        return citation;
+    });
+    const citationLinks = citations.map(c => c.url || '').join(', ');
+    const citationTitles = citations.map(c => c.title || '').join(', ');
+    const citationAuthors = citations.map(c => c.author || '').join(', ');
+    const citationDates = citations.map(c => c.date || '').join(', ');
+
     const optionsHtml = `
         <div class="template-option">
-            <label><input type="checkbox" id="include-infobox" checked> Include Infobox</label>
+            <label><input type="checkbox" id="include-infobox" ${hasInfobox ? 'checked' : ''}> Include Infobox</label>
             <div id="infobox-fields" style="margin-left: 1.5rem; margin-top: 0.5rem;"></div>
         </div>
         <div class="template-option">
-            <label><input type="checkbox" id="include-sections" checked> Include Sections</label>
+            <label><input type="checkbox" id="include-sections" ${existingSections.length > 0 ? 'checked' : ''}> Include Sections</label>
             <div id="section-options" style="margin-left: 1.5rem; margin-top: 0.5rem;"></div>
         </div>
         <div class="template-option">
-            <label><input type="checkbox" id="include-citations" checked> Include Citations</label>
+            <label><input type="checkbox" id="include-citations" ${hasCitations ? 'checked' : ''}> Include Citations</label>
+            <div id="citation-options" style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                <label for="citation-links">Links (comma-separated):</label>
+                <input type="text" id="citation-links" value="${citationLinks}" placeholder="e.g., https://example.com, https://example2.com">
+                <label for="citation-titles">Titles (comma-separated):</label>
+                <input type="text" id="citation-titles" value="${citationTitles}" placeholder="e.g., Article Title 1, Article Title 2">
+                <label for="citation-authors">Authors (comma-separated):</label>
+                <input type="text" id="citation-authors" value="${citationAuthors}" placeholder="e.g., Author 1, Author 2">
+                <label for="citation-dates">Dates (comma-separated):</label>
+                <input type="text" id="citation-dates" value="${citationDates}" placeholder="e.g., 2025-08-17, 2025-08-18">
+            </div>
         </div>
     `;
     optionsContainer.innerHTML = optionsHtml;
+
     const infoboxFieldsContainer = document.getElementById('infobox-fields');
     infoboxFields.forEach(field => {
         const label = document.createElement('label');
-        label.innerHTML = `<input type="checkbox" name="infobox-field" value="${field}" checked> ${field}`;
+        label.innerHTML = `<input type="checkbox" name="infobox-field" value="${field}" ${existingInfoboxFields.includes(field) ? 'checked' : ''}> ${field}`;
         infoboxFieldsContainer.appendChild(label);
     });
+
     const sectionsContainer = document.getElementById('section-options');
     sections.forEach(section => {
         const label = document.createElement('label');
-        label.innerHTML = `<input type="checkbox" name="section" value="${section}" checked> ${section}`;
+        label.innerHTML = `<input type="checkbox" name="section" value="${section}" ${existingSections.includes(section) ? 'checked' : ''}> ${section}`;
         sectionsContainer.appendChild(label);
     });
 }
@@ -366,24 +406,50 @@ function generateTemplate() {
     const includeSections = document.getElementById('include-sections').checked;
     const sections = Array.from(document.querySelectorAll('input[name="section"]:checked')).map(input => input.value);
     const includeCitations = document.getElementById('include-citations').checked;
+    const citationLinks = document.getElementById('citation-links').value.split(',').map(s => s.trim()).filter(s => s);
+    const citationTitles = document.getElementById('citation-titles').value.split(',').map(s => s.trim()).filter(s => s);
+    const citationAuthors = document.getElementById('citation-authors').value.split(',').map(s => s.trim()).filter(s => s);
+    const citationDates = document.getElementById('citation-dates').value.split(',').map(s => s.trim()).filter(s => s);
+
+    const content = document.getElementById('content');
+    let currentContent = content.value.trim();
     let template = '';
-    if (includeInfobox && infoboxFields.length > 0) {
+
+    // Append infobox if selected and not already present
+    if (includeInfobox && infoboxFields.length > 0 && !currentContent.match(/{{Infobox\s*\|/)) {
         template += '{{Infobox\n';
         infoboxFields.forEach(field => {
             template += `|${field} = \n`;
         });
         template += '}}\n\n';
     }
+
+    // Append new sections if selected and not already present
     if (includeSections && sections.length > 0) {
-        sections.forEach(section => {
+        const existingSections = currentContent.match(/^==\s*([^\n=]+?)\s*==$/gm)?.map(match => match.replace(/^==\s*|\s*==$/g, '')) || [];
+        const newSections = sections.filter(section => !existingSections.includes(section));
+        newSections.forEach(section => {
             template += `==${section}==\n\n`;
         });
     }
-    if (includeCitations) {
-        template += '==References==\n{{Cite|title=|author=|url=|date=}}\n';
+
+    // Append citations if selected
+    if (includeCitations && citationTitles.length > 0) {
+        if (!currentContent.match(/^==\s*References\s*==$/m)) {
+            template += '==References==\n';
+        }
+        citationTitles.forEach((title, index) => {
+            const url = citationLinks[index] || '';
+            const author = citationAuthors[index] || '';
+            const date = citationDates[index] || '';
+            template += `{{Cite|title=${title}|author=${author}|url=${url}|date=${date}}}\n`;
+        });
     }
-    const content = document.getElementById('content');
-    if (!content.value || confirm('Generate template? This will overwrite current content.')) {
+
+    // Append template to existing content if there's content, otherwise set it
+    if (currentContent && template) {
+        content.value = currentContent + (currentContent.endsWith('\n') ? '' : '\n') + template;
+    } else if (template) {
         content.value = template;
     }
 }
