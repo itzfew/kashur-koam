@@ -7,8 +7,6 @@
     --light-border: #e8eaed; /* Lighter border for subtle lines */
     --text-color: #202124; /* Primary text */
     --light-text: #5f6368; /* Secondary text */
-    --warning-color: #f4b400; /* Citation notice border */
-    --warning-icon: #d81b60; /* Citation icon */
     --infobox-subheader: #e8f0fe; /* Infobox header background */
     --sidebar-width: 280px; /* Wider sidebar for better readability */
     --max-content-width: 1440px; /* Wider max content for large screens */
@@ -459,6 +457,13 @@ main {
     font-size: 0.9rem;
     max-height: 4em;
     overflow: hidden;
+}
+#citation-options input {
+    margin-bottom: 0.75rem;
+}
+#citation-options label {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
 }
 
 /* Page content */
