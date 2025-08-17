@@ -15,6 +15,8 @@
     --dark-text: #e0e0e0; /* Dark mode text */
     --dark-border: #3a4443; /* Dark mode border */
     --transition: all 0.3s ease; /* Smooth transitions */
+    --warning-color: #ff6f00; /* For citation notices */
+    --warning-icon: #d81b60; /* For citation notice icons */
 }
 
 /* Dark mode styles */
@@ -31,13 +33,16 @@
         background-color: var(--secondary-color);
         color: var(--text-color);
     }
-    header, .infobox, form, #login-form, .box-More_citations_needed {
+    header, .infobox, form, #login-form {
         background-color: #2c3539;
         border-color: var(--dark-border);
     }
     #search-bar {
         background-color: #3a4443;
         color: var(--dark-text);
+    }
+    .mw-heading, .infobox-above, .infobox-subheader {
+        border-color: var(--dark-border);
     }
 }
 
@@ -50,7 +55,7 @@
 
 body {
     font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif;
-    font-size: clamp(15px, 2.5vw, 16px); /* Adaptive font size */
+    font-size: clamp(15px, 2.5vw, 16px);
     line-height: 1.75;
     color: var(--text-color);
     background-color: var(--secondary-color);
@@ -58,6 +63,11 @@ body {
     flex-direction: column;
     min-height: 100vh;
     overflow-x: hidden;
+}
+
+/* Hide raw wiki markup to prevent unconverted text */
+.mw-parser-output :where([data-raw-markup]) {
+    display: none;
 }
 
 /* Loading spinner */
@@ -405,7 +415,7 @@ main {
     width: 1px;
 }
 
-/* Citation notice */
+/* Citation notice (not used since citation inputs are removed) */
 .citation-wrapper {
     margin: clamp(1rem, 2vw, 1.5rem);
 }
@@ -457,13 +467,6 @@ main {
     font-size: 0.9rem;
     max-height: 4em;
     overflow: hidden;
-}
-#citation-options input {
-    margin-bottom: 0.75rem;
-}
-#citation-options label {
-    margin-top: 0.75rem;
-    font-size: 0.95rem;
 }
 
 /* Page content */
@@ -594,6 +597,7 @@ a:hover {
     color: #0b0080;
 }
 
+/* Reference styles */
 .reference {
     font-size: 0.8em;
     line-height: 1;
@@ -602,10 +606,32 @@ a:hover {
 
 .reference a {
     color: var(--primary-color);
+    padding: 0 2px;
 }
 
 .reference a:hover {
+    text-decoration: none;
+    background-color: rgba(26, 115, 232, 0.1);
+}
+
+#cite-references {
+    margin: 1em 0 1em 2em;
+    padding-left: 0;
+    list-style: decimal;
+}
+
+#cite-references li {
+    margin-bottom: 0.75em;
+    font-size: clamp(0.9em, 2vw, 0.95em);
+}
+
+#cite-references a {
+    color: var(--primary-color);
     text-decoration: underline;
+}
+
+#cite-references a:hover {
+    color: #0b0080;
 }
 
 /* Content styles */
@@ -911,7 +937,7 @@ footer {
         padding: 1rem;
     }
 
-    .page-actions-top, .pre-content, .content, .citation-wrapper {
+    .page-actions-top, .pre-content, .content {
         margin: 0 1rem;
     }
 
