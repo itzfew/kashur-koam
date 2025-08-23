@@ -9,7 +9,7 @@ async function generateAtomFeed() {
         const updated = new Date().toISOString();
 
         // Load the Atom XML template
-        const atomTemplate = `<<?xml version="1.0" encoding="UTF-8"?>
+        const atomTemplate = `<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Kashurpedia</title>
     <link href="https://example.com/" rel="alternate"/>
@@ -26,14 +26,14 @@ async function generateAtomFeed() {
             // Assume article has id, title, shortDescription, and publishedDate
             // If publishedDate is not provided by the server, use current date as fallback
             const pubDate = article.publishedDate ? new Date(article.publishedDate).toISOString() : updated;
-const entry = `
-<entry>
-  <title>${escapeXml(article.title)}</title>
-  <link href="https://kashurpedia.pages.dev/posts/${article.slug}.html" rel="alternate"/>
-  <id>urn:uuid:${generateUUID(String(article.id))}</id>
-  <updated>${pubDate}</updated>
-  <summary><![CDATA[${article.shortDescription || 'No description available'}]]></summary>
-</entry>`;
+            const entry = `
+    <entry>
+        <title>${escapeXml(article.title)}</title>
+        <link href="https://example.com/article.html?id=${encodeURIComponent(article.id)}" rel="alternate"/>
+        <id>urn:uuid:${generateUUID(article.id)}</id>
+        <updated>${pubDate}</updated>
+        <summary>${escapeXml(article.shortDescription || 'No description available')}</summary>
+    </entry>`;
             entries += entry;
         });
 
