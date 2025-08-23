@@ -5,7 +5,6 @@ description: >-
 baseurl: "" 
 url: "https://YOUR-PAGES-URL.pages.dev" # replace with Cloudflare Pages URL
 
-theme: minima
 
 plugins:
   - jekyll-feed
