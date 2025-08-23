@@ -1,4 +1,0 @@
----
-layout: none
----
-{{ site | jekyll_feed }}
