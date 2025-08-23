@@ -1,11 +1,18 @@
-title: My Articles Blog
-email: you@example.com
-description: >- 
-  A simple article site with admin approval.
-baseurl: "" 
-url: "https://YOUR-USERNAME.github.io" # replace with your repo URL
+backend:
+  name: github
+  repo: YOUR-USERNAME/YOUR-REPO # Replace with your GitHub repo
+  branch: main
 
-theme: minima
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
 
-plugins:
-  - jekyll-feed
+collections:
+  - name: "posts"
+    label: "Posts"
+    folder: "_posts"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - {label: "Title", name: "title", widget: "string"}
+      - {label: "Publish Date", name: "date", widget: "datetime"}
+      - {label: "Body", name: "body", widget: "markdown"}
