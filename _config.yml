@@ -3,7 +3,7 @@ email: you@example.com
 description: >-
   A well-designed, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages.
 baseurl: "" 
-url: "https://YOUR-PAGES-URL.pages.dev" # replace with your site URL
+url: "https://kashurpedia.pages.dev" # replace with your site URL
 
 # Use minima theme but also provide custom layouts
 theme: minima
