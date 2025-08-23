@@ -9,7 +9,7 @@ async function generateAtomFeed() {
         const updated = new Date().toISOString();
 
         // Load the Atom XML template
-        const atomTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+        const atomTemplate = `<<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <title>Kashurpedia</title>
     <link href="https://example.com/" rel="alternate"/>
