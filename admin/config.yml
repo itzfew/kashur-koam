@@ -1,9 +1,8 @@
 backend:
-  name: github
-  repo: YOUR-USERNAME/YOUR-REPO # Replace with your GitHub repo
-  branch: main
+  name: git-gateway
+  branch: main  # or master, depending on your repo
 
-media_folder: "assets/uploads"
+media_folder: "assets/uploads"   # Where uploaded images will go
 public_folder: "/assets/uploads"
 
 collections:
@@ -13,6 +12,6 @@ collections:
     create: true
     slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
-      - {label: "Title", name: "title", widget: "string"}
-      - {label: "Publish Date", name: "date", widget: "datetime"}
-      - {label: "Body", name: "body", widget: "markdown"}
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime" }
+      - { label: "Body", name: "body", widget: "markdown" }
