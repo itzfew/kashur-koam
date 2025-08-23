@@ -1,0 +1,28 @@
+---
+layout: default
+---
+
+<section class="hero">
+  <h1>{{ site.title }}</h1>
+  <p class="tagline">{{ site.description }}</p>
+</section>
+
+<section class="posts-list">
+  {% for post in paginator.posts %}
+  <article class="post-preview">
+    <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+    <p class="meta">{{ post.date | date: "%B %d, %Y" }} {% if post.categories %} • {{ post.categories | join: ", " }}{% endif %}</p>
+    <div class="excerpt">{{ post.excerpt | strip_html | truncate: 250 }}</div>
+    <a class="read-more" href="{{ post.url | relative_url }}">Read More →</a>
+  </article>
+  {% endfor %}
+</section>
+
+<nav class="pagination">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | relative_url }}">&larr; Newer</a>
+  {% endif %}
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | relative_url }}">Older &rarr;</a>
+  {% endif %}
+</nav>
