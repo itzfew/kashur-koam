@@ -1,6 +1,6 @@
 source "https://rubygems.org"
-gem "jekyll", "~> 4.4"
-gem "minima", "~> 3.0"
+
+gem "jekyll"
 gem "webrick"
 gem "jekyll-seo-tag"
 gem "jekyll-sitemap"
