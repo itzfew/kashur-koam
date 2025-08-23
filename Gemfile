@@ -1,3 +1,5 @@
 source "https://rubygems.org"
+
 gem "jekyll"
 gem "webrick"
+gem "minima"   # add this line
