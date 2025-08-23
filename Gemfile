@@ -1,5 +1,8 @@
 source "https://rubygems.org"
-
-gem "jekyll"
+gem "jekyll", "~> 4.4"
+gem "minima", "~> 3.0"
 gem "webrick"
-gem "minima"   # add this line
+gem "jekyll-seo-tag"
+gem "jekyll-sitemap"
+gem "jekyll-feed"
+gem "jekyll-paginate"

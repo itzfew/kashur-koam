@@ -1,11 +1,33 @@
-title: My Articles Blog
+title: Kashurpedia
 email: you@example.com
 description: >-
-  A simple article site built with Jekyll.
+  A well-designed, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages.
 baseurl: "" 
-url: "https://kashurpedia.pages.dev" # replace with Cloudflare Pages URL
+url: "https://YOUR-PAGES-URL.pages.dev" # replace with your site URL
 
+# Use minima theme but also provide custom layouts
 theme: minima
 
 plugins:
   - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-paginate
+
+paginate: 5
+paginate_path: "/page:num/"
+exclude:
+  - "node_modules"
+  - "vendor/bundle"
+  - "Gemfile.lock"
+
+# Excerpt separator for manual excerpts
+excerpt_separator: "<!--more-->"
+
+# Author / Social (used by jekyll-seo-tag)
+author:
+  name: "Your Name"
+  email: you@example.com
+social:
+  twitter: your_twitter_handle
+  github: itzfew
