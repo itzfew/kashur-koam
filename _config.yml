@@ -3,7 +3,7 @@ email: you@example.com
 description: >-
   A simple article site built with Jekyll.
 baseurl: "" 
-url: "https://YOUR-PAGES-URL.pages.dev" # replace with Cloudflare Pages URL
+url: "https://kashurpedia.pages.dev" # replace with Cloudflare Pages URL
 
 
 plugins:
