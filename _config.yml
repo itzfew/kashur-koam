@@ -5,6 +5,7 @@ description: >-
 baseurl: "" 
 url: "https://kashurpedia.pages.dev" # replace with Cloudflare Pages URL
 
+theme: minima
 
 plugins:
   - jekyll-feed
