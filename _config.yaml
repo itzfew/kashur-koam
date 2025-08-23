@@ -1,0 +1,11 @@
+title: My Articles Blog
+email: you@example.com
+description: >- 
+  A simple article site with admin approval.
+baseurl: "" 
+url: "https://YOUR-USERNAME.github.io" # replace with your repo URL
+
+theme: minima
+
+plugins:
+  - jekyll-feed
