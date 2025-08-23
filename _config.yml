@@ -1,9 +1,8 @@
 title: Kashurpedia
 email: you@example.com
-description: >-
-  A well-designed, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages.
+description: "A well-designed, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages."
 baseurl: "" 
-url: "https://kashurpedia.pages.dev" # replace with your site URL
+url: "https://kashurpedia.pages.dev"  # replace with your site URL
 
 plugins:
   - jekyll-feed
@@ -14,9 +13,9 @@ plugins:
 paginate: 5
 paginate_path: "/page:num/"
 exclude:
-  - "node_modules"
-  - "vendor/bundle"
-  - "Gemfile.lock"
+  - node_modules
+  - vendor/bundle
+  - Gemfile.lock
 
 # Excerpt separator for manual excerpts
 excerpt_separator: "<!--more-->"
@@ -25,6 +24,7 @@ excerpt_separator: "<!--more-->"
 author:
   name: "Your Name"
   email: you@example.com
+
 social:
   twitter: your_twitter_handle
   github: itzfew
