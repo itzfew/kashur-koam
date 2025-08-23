@@ -1,4 +1,5 @@
 ---
-layout: nil
+layout: none
 ---
-{{ "/feed.xml" | relative_url }}
+
+{{ site | jekyll_feed }}
