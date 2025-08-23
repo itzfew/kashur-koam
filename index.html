@@ -1,57 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kashurpedia - Home</title>
-    <meta name="description" content="Kashurpedia: Explore articles about Kashmir's villages, districts, famous people, colleges, schools, and mosques.">
-    <meta name="keywords" content="Kashmir, encyclopedia, villages, districts, famous people, colleges, schools, mosques">
-    <meta name="robots" content="index, follow">
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Linux+Libertine&display=swap">
-</head>
-<body>
-    <div id="loading" class="loading-spinner" style="display: none;">
-        <div class="spinner"></div>
-    </div>
-    <header>
-        <h1><a href="index.html" class="logo">Kashurpedia</a></h1>
-        <div class="search-container">
-            <input type="text" id="search-bar" placeholder="Search articles...">
-            <button onclick="searchArticles()">Search</button>
-        </div>
-        <div id="user-profile">
-            <a href="login.html">Login</a>
-        </div>
-    </header>
-    <main>
-        <section id="categories">
-            <h2>Categories</h2>
-            <ul>
-                <li><a href="#" onclick="loadArticlesByCategory('Villages')">Villages</a></li>
-                <li><a href="#" onclick="loadArticlesByCategory('Districts')">Districts</a></li>
-                <li><a href="#" onclick="loadArticlesByCategory('Famous People')">Famous People</a></li>
-                <li><a href="#" onclick="loadArticlesByCategory('Colleges')">Colleges</a></li>
-                <li><a href="#" onclick="loadArticlesByCategory('Schools')">Schools</a></li>
-                <li><a href="#" onclick="loadArticlesByCategory('Mosques')">Mosques</a></li>
-            </ul>
-        </section>
-        <section id="latest-articles">
-            <h2>Latest Articles</h2>
-            <ul id="latest-list"></ul>
-            <a href="submit.html" class="submit-link">Submit New Article</a>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2025 Kashurpedia. All rights reserved.</p>
-    </footer>
-    <script src="config.js"></script>
-    <script src="app.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            checkLogin();
-            loadLatestArticles();
-        });
-    </script>
-</body>
-</html>
+---
+layout: default
+title: Home
+---
+
+<h1>Latest Articles</h1>
+<ul>
+  {% for post in site.posts %}
+    <li>
+      <a href="{{ post.url }}">{{ post.title }}</a> - {{ post.date | date: "%B %d, %Y" }}
+    </li>
+  {% endfor %}
+</ul>
