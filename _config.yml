@@ -1,8 +1,9 @@
+
 title: Kashurpedia
 email: you@example.com
-description: "A well-designed, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages."
-baseurl: "" 
-url: "https://kashurpedia.pages.dev"  # replace with your site URL
+description: "A fully custom, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages."
+baseurl: ""
+url: "https://kashurpedia.pages.dev"
 
 plugins:
   - jekyll-feed
@@ -17,10 +18,8 @@ exclude:
   - vendor/bundle
   - Gemfile.lock
 
-# Excerpt separator for manual excerpts
 excerpt_separator: "<!--more-->"
 
-# Author / Social (used by jekyll-seo-tag)
 author:
   name: "Your Name"
   email: you@example.com
