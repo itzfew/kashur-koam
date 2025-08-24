@@ -1,11 +1,20 @@
-// Enhanced client-side search without search.json
+// Enhanced client-side search with redirect to search results page
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('search-input');
   if (!searchInput) return;
   
   let searchIndex = [];
   let searchResults = document.getElementById('search-results');
-  let isIndexing = false;
+  
+  // Load search index
+  fetch('/search.json')
+    .then(response => response.json())
+    .then(data => {
+      searchIndex = data;
+    })
+    .catch(error => {
+      console.error('Error loading search index:', error);
+    });
   
   // Create search results container if it doesn't exist
   if (!searchResults) {
@@ -15,189 +24,10 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.parentNode.appendChild(searchResults);
   }
   
-  // Function to index all articles on the site
-  async function buildSearchIndex() {
-    if (isIndexing) return;
-    isIndexing = true;
-    
-    // Show loading indicator
-    searchResults.innerHTML = '<div class="search-result-item">Indexing content...</div>';
-    searchResults.style.display = 'block';
-    
-    try {
-      // First, try to get list of posts from the sitemap or API
-      let posts = [];
-      
-      // Method 1: Try to fetch from sitemap.xml
-      try {
-        const sitemapResponse = await fetch('/sitemap.xml');
-        if (sitemapResponse.ok) {
-          const sitemapText = await sitemapResponse.text();
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(sitemapText, "text/xml");
-          const urls = xmlDoc.getElementsByTagName("url");
-          
-          for (let i = 0; i < urls.length; i++) {
-            const loc = urls[i].getElementsByTagName("loc")[0];
-            if (loc && loc.textContent) {
-              const url = loc.textContent;
-              // Only index post pages (adjust this pattern as needed)
-              if (url.includes('/20') || url.match(/\/(\d{4})\/(\d{2})\/(\d{2})/)) {
-                posts.push(url);
-              }
-            }
-          }
-        }
-      } catch (e) {
-        console.log('Sitemap not available, using alternative method');
-      }
-      
-      // Method 2: If sitemap fails, try to find posts by scanning page links
-      if (posts.length === 0) {
-        const allLinks = document.querySelectorAll('a[href]');
-        const postLinks = new Set();
-        
-        allLinks.forEach(link => {
-          const href = link.getAttribute('href');
-          if (href && (href.includes('/20') || href.match(/\/(\d{4})\/(\d{2})\/(\d{2})/))) {
-            // Convert to absolute URL if relative
-            const absoluteUrl = href.startsWith('http') ? href : new URL(href, window.location.origin).href;
-            postLinks.add(absoluteUrl);
-          }
-        });
-        
-        posts = Array.from(postLinks);
-      }
-      
-      // Method 3: If still no posts, use the current page's posts (for home page)
-      if (posts.length === 0) {
-        const postPreviews = document.querySelectorAll('.post-preview, article');
-        postPreviews.forEach(post => {
-          const link = post.querySelector('a[href]');
-          if (link) {
-            const href = link.getAttribute('href');
-            const absoluteUrl = href.startsWith('http') ? href : new URL(href, window.location.origin).href;
-            posts.push(absoluteUrl);
-          }
-        });
-      }
-      
-      // Index each post
-      searchIndex = [];
-      const indexingPromises = posts.map(async (postUrl) => {
-        try {
-          // Skip if already indexed
-          if (searchIndex.some(item => item.url === postUrl)) return;
-          
-          // Fetch the post content
-          const response = await fetch(postUrl);
-          if (!response.ok) return;
-          
-          const html = await response.text();
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, "text/html");
-          
-          // Extract post data
-          const title = doc.querySelector('h1, .post-title, .post-full h1, title')?.textContent || '';
-          const content = doc.querySelector('.content, .post-content, article')?.textContent || '';
-          const excerpt = doc.querySelector('.excerpt, .post-excerpt, meta[name="description"]')?.content || 
-                          content.substring(0, 200) + '...';
-          
-          // Extract categories
-          const categories = [];
-          const categoryLinks = doc.querySelectorAll('.meta a[href*="/categories/"], .post-categories a');
-          categoryLinks.forEach(link => {
-            const category = link.textContent.trim();
-            if (category && !categories.includes(category)) {
-              categories.push(category);
-            }
-          });
-          
-          // Extract date
-          let date = '';
-          const dateElement = doc.querySelector('.meta time, .post-date, [datetime]');
-          if (dateElement) {
-            date = dateElement.getAttribute('datetime') || dateElement.textContent;
-          }
-          
-          // Add to index
-          searchIndex.push({
-            url: postUrl,
-            title: title.trim(),
-            content: content.trim(),
-            excerpt: excerpt.trim(),
-            categories: categories,
-            date: date
-          });
-        } catch (error) {
-          console.error('Error indexing:', postUrl, error);
-        }
-      });
-      
-      await Promise.all(indexingPromises);
-      
-      // Store index in localStorage for future use
-      try {
-        localStorage.setItem('searchIndex', JSON.stringify({
-          data: searchIndex,
-          timestamp: Date.now()
-        }));
-      } catch (e) {
-        console.log('LocalStorage not available');
-      }
-      
-    } catch (error) {
-      console.error('Error building search index:', error);
-      searchResults.innerHTML = '<div class="search-result-item">Error loading search. Please refresh the page.</div>';
-    }
-    
-    isIndexing = false;
-  }
-  
-  // Try to load search index from localStorage first
-  function loadSearchIndexFromStorage() {
-    try {
-      const stored = localStorage.getItem('searchIndex');
-      if (stored) {
-        const { data, timestamp } = JSON.parse(stored);
-        // Use stored index if it's less than 1 hour old
-        if (data && timestamp && (Date.now() - timestamp < 60 * 60 * 1000)) {
-          searchIndex = data;
-          return true;
-        }
-      }
-    } catch (e) {
-      console.log('Cannot load from localStorage');
-    }
-    return false;
-  }
-  
-  // Initialize search
-  if (!loadSearchIndexFromStorage()) {
-    // Build index when user focuses on search or after a short delay
-    let indexBuilt = false;
-    
-    const buildIndexWhenNeeded = () => {
-      if (!indexBuilt) {
-        indexBuilt = true;
-        buildSearchIndex();
-      }
-    };
-    
-    searchInput.addEventListener('focus', buildIndexWhenNeeded);
-    setTimeout(buildIndexWhenNeeded, 2000); // Build index after 2 seconds
-  }
-  
   // Search function
   function performSearch(query) {
     if (query.length < 2) {
       searchResults.style.display = 'none';
-      return;
-    }
-    
-    if (searchIndex.length === 0) {
-      searchResults.innerHTML = '<div class="search-result-item">Search index not ready yet. Please try again.</div>';
-      searchResults.style.display = 'block';
       return;
     }
     
@@ -211,8 +41,11 @@ document.addEventListener('DOMContentLoaded', function() {
       const categoryMatch = item.categories && item.categories.some(cat => 
         regex.test(cat)
       );
+      const tagsMatch = item.tags && item.tags.some(tag => 
+        regex.test(tag)
+      );
       
-      return titleMatch || contentMatch || categoryMatch;
+      return titleMatch || contentMatch || categoryMatch || tagsMatch;
     });
     
     // Sort by relevance (title matches first, then category, then content)
@@ -259,9 +92,8 @@ document.addEventListener('DOMContentLoaded', function() {
       return `
         <a href="${result.url}" class="search-result-item">
           <div class="search-result-title">${highlightedTitle}</div>
-          ${result.categories && result.categories.length > 0 ? 
-            `<div class="search-result-category">${result.categories.join(', ')}</div>` : ''}
-          <div class="search-result-excerpt">${result.excerpt.substring(0, 100)}...</div>
+          ${result.categories ? `<div class="search-result-category">${result.categories.join(', ')}</div>` : ''}
+          <div class="search-result-excerpt">${result.excerpt ? result.excerpt.substring(0, 100) + '...' : ''}</div>
         </a>
       `;
     }).join('');
@@ -272,9 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle search form submission (redirect to search results page)
   function handleSearchSubmit(query) {
     if (query.length > 0) {
-      // Store query for results page
-      sessionStorage.setItem('searchQuery', query);
-      // Redirect to search results page
+      // Redirect to search results page with query parameter
       window.location.href = `/search/?q=${encodeURIComponent(query)}`;
     }
   }
@@ -295,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   searchInput.addEventListener('focus', function() {
-    if (searchInput.value.length >= 2 && searchIndex.length > 0) {
+    if (searchInput.value.length >= 2) {
       searchResults.style.display = 'block';
     }
   });
@@ -471,10 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 if (window.location.pathname === '/search/') {
   document.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
-    const query = urlParams.get('q') || sessionStorage.getItem('searchQuery') || '';
-    
-    // Clear stored query
-    sessionStorage.removeItem('searchQuery');
+    const query = urlParams.get('q');
     
     if (query) {
       const searchResultsContainer = document.getElementById('search-results-list');
@@ -484,103 +311,57 @@ if (window.location.pathname === '/search/') {
         searchQueryElement.textContent = query;
       }
       
-      // Try to load search index from localStorage
-      let searchIndex = [];
-      try {
-        const stored = localStorage.getItem('searchIndex');
-        if (stored) {
-          const { data } = JSON.parse(stored);
-          if (data) searchIndex = data;
-        }
-      } catch (e) {
-        console.log('Cannot load from localStorage');
-      }
-      
-      // If no index in storage, try to build it from current page
-      if (searchIndex.length === 0) {
-        const postPreviews = document.querySelectorAll('.post-preview, article');
-        postPreviews.forEach(post => {
-          const link = post.querySelector('a[href]');
-          if (link) {
-            const href = link.getAttribute('href');
-            const absoluteUrl = href.startsWith('http') ? href : new URL(href, window.location.origin).href;
-            
-            const title = post.querySelector('h2, h3, .post-title')?.textContent || '';
-            const excerpt = post.querySelector('.excerpt, .post-excerpt')?.textContent || '';
-            
-            // Extract categories
-            const categories = [];
-            const categoryLinks = post.querySelectorAll('.meta a[href*="/categories/"], .post-categories a');
-            categoryLinks.forEach(catLink => {
-              const category = catLink.textContent.trim();
-              if (category && !categories.includes(category)) {
-                categories.push(category);
-              }
-            });
-            
-            searchIndex.push({
-              url: absoluteUrl,
-              title: title.trim(),
-              excerpt: excerpt.trim(),
-              categories: categories
-            });
-          }
-        });
-      }
-      
-      if (searchResultsContainer) {
-        if (searchIndex.length > 0) {
+      // Load search index and display results
+      fetch('/search.json')
+        .then(response => response.json())
+        .then(searchIndex => {
           const results = searchIndex.filter(item => {
             const regex = new RegExp(query, 'i');
             return (
               (item.title && regex.test(item.title)) ||
-              (item.excerpt && regex.test(item.excerpt)) ||
-              (item.categories && item.categories.some(cat => regex.test(cat)))
+              (item.content && regex.test(item.content)) ||
+              (item.categories && item.categories.some(cat => regex.test(cat))) ||
+              (item.tags && item.tags.some(tag => regex.test(tag)))
             );
           });
           
-          if (results.length > 0) {
-            searchResultsContainer.innerHTML = results.map(result => {
-              // Highlight query in title
-              let highlightedTitle = result.title;
-              if (query.length >= 2) {
-                const regex = new RegExp(query, 'gi');
-                highlightedTitle = result.title.replace(regex, match => 
-                  `<span class="search-highlight">${match}</span>`
-                );
-              }
-              
-              return `
+          if (searchResultsContainer) {
+            if (results.length > 0) {
+              searchResultsContainer.innerHTML = results.map(result => `
                 <div class="search-result-item">
-                  <h2><a href="${result.url}">${highlightedTitle}</a></h2>
-                  ${result.categories && result.categories.length > 0 ? 
-                    `<div class="search-result-meta">${result.categories.join(', ')}</div>` : ''}
+                  <h2><a href="${result.url}">${result.title}</a></h2>
+                  <div class="search-result-meta">
+                    ${result.date ? new Date(result.date).toLocaleDateString() : ''}
+                    ${result.categories ? ` • ${result.categories.join(', ')}` : ''}
+                  </div>
                   <div class="search-result-excerpt">
                     ${result.excerpt || ''}
                   </div>
                   <a href="${result.url}" class="read-more">Read More</a>
                 </div>
+              `).join('');
+            } else {
+              searchResultsContainer.innerHTML = `
+                <div class="no-results">
+                  <h2>No results found for "${query}"</h2>
+                  <p>Try different keywords or browse our categories</p>
+                  <a href="/" class="btn btn-primary">Return to Homepage</a>
+                </div>
               `;
-            }).join('');
-          } else {
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading search results:', error);
+          if (searchResultsContainer) {
             searchResultsContainer.innerHTML = `
               <div class="no-results">
-                <h2>No results found for "${query}"</h2>
-                <p>Try different keywords or browse our categories</p>
-                <a href="/" class="btn btn-primary">Return to Homepage</a>
+                <h2>Error loading search results</h2>
+                <p>Please try again later</p>
               </div>
             `;
           }
-        } else {
-          searchResultsContainer.innerHTML = `
-            <div class="no-results">
-              <h2>Search index not available</h2>
-              <p>Please use the search box on the homepage to find content</p>
-              <a href="/" class="btn btn-primary">Return to Homepage</a>
-            </div>
-          `;
-        }
-      }
+        });
     }
   });
 }
