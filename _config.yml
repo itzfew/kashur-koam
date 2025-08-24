@@ -1,17 +1,46 @@
 title: Kashurpedia
-email: you@example.com
-description: "A fully custom, SEO-ready Jekyll blog ready for Cloudflare Pages or GitHub Pages."
+email: itzme.eduhub.contact@gmail.com
+description: "Explore Kashmiri culture, villages, mosques, districts, and schools through our comprehensive encyclopedia."
 baseurl: ""
-url: "https://kashurpedia.pages.dev"
+url: "https://kashurpedia.pages.dev"  # Update with your actual domain
+
+# SEO Optimization
+twitter_username: kashurpedia  # Update with your actual handle
+github_username: itzfew  # Update with your actual handle
+author: "Kashurpedia Team"
 
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
   - jekyll-paginate
+  - jekyll-archives  # For category/tag pages
 
-paginate: 5
+# Pagination
+paginate: 6
 paginate_path: "/page:num/"
+
+# Categories/Collections
+collections:
+  categories:
+    output: true
+    permalink: /:name/
+
+defaults:
+  - scope:
+      path: ""
+      type: "categories"
+    values:
+      layout: "category"
+
+# Category archives (for labels)
+jekyll-archives:
+  enabled: ['categories']
+  layouts:
+    category: 'category.html'
+  permalinks:
+    category: '/categories/:name/'
+
 exclude:
   - node_modules
   - vendor/bundle
@@ -19,10 +48,9 @@ exclude:
 
 excerpt_separator: "<!--more-->"
 
-author:
-  name: "Your Name"
-  email: you@example.com
-
+# Social links
 social:
-  twitter: your_twitter_handle
-  github: itzfew
+  twitter: kashurpedia
+  facebook: kashurpedia
+  telegram: kashurpedia
+  whatsapp: https://wa.me/?text=Check out Kashurpedia
