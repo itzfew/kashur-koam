@@ -11,11 +11,6 @@ author: "Ahmad Bhat"
 
 Situated just a few kilometers from **Shopian town**, **Dreri Kali Pora (commonly known as D.K. Pora)** is a serene Kashmiri village that beautifully reflects the charm of rural life in the valley. Known for its **apple orchards, mountain views, and traditional Kashmiri lifestyle**, the village is a perfect destination for travelers seeking peace, culture, and authentic countryside experiences.  
 
-![Dreri Kali Pora Village](/assets/images/dreri-kali-pora-valley.jpg)  
-*The scenic apple orchards of Dreri Kali Pora*
-
-<!--more-->
-
 ## History and Significance
 
 Dreri Kali Pora has been inhabited for centuries, with generations engaged in farming and traditional crafts. The village represents the **true essence of Kashmiri culture** — a blend of simplicity, resilience, and community spirit. It is governed by a locally elected **Sarpanch (village head)** under the Panchayati Raj system, reflecting its strong grassroots democratic traditions.  
