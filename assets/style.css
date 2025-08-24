@@ -279,6 +279,10 @@ body {
   margin-bottom: 10px;
 }
 
+.category-card p {
+  margin: 0;
+}
+
 /* Posts List */
 .posts-list {
   margin: 40px 0;
@@ -509,9 +513,10 @@ body {
   font-weight: 500;
   transition: var(--transition);
   flex-shrink: 0;
+  position: relative;
 }
 
-.share-btn span {
+.share-btn .share-text {
   display: none;
 }
 
@@ -524,6 +529,21 @@ body {
 .share-btn:hover {
   opacity: 0.9;
   transform: translateY(-2px);
+}
+
+.share-btn:hover::after {
+  content: attr(data-platform);
+  position: absolute;
+  bottom: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  z-index: 10;
 }
 
 .related-posts h3 {
@@ -805,8 +825,8 @@ body {
   .main-nav {
     position: fixed;
     top: 0;
-    right: -300px;
-    width: 300px;
+    right: -80%;
+    width: 80%;
     height: 100vh;
     background: white;
     box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
@@ -819,7 +839,7 @@ body {
   }
 
   .main-nav.active {
-    transform: translateX(-300px);
+    transform: translateX(-80%);
     right: 0;
   }
 
@@ -938,6 +958,36 @@ body {
     justify-content: flex-start;
     padding-bottom: 15px;
   }
+
+  /* Categories grid adjustment for mobile */
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .category-card {
+    padding: 20px 15px;
+  }
+
+  .category-card p {
+    display: none;
+  }
+
+  .category-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .category-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+
+  /* Featured categories heading adjustment */
+  .featured-categories h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+  }
 }
 
 /* Animation for dropdown */
@@ -1043,5 +1093,30 @@ body.menu-open {
   .hero-actions .btn {
     width: 200px;
     text-align: center;
+  }
+
+  .main-nav {
+    right: -85%;
+    width: 85%;
+  }
+
+  .main-nav.active {
+    transform: translateX(-85%);
+  }
+
+  /* Even smaller screens */
+  @media (max-width: 360px) {
+    .categories-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .main-nav {
+      right: -90%;
+      width: 90%;
+    }
+
+    .main-nav.active {
+      transform: translateX(-90%);
+    }
   }
 }
