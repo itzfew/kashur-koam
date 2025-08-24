@@ -144,6 +144,33 @@ body {
   font-size: 1rem;
 }
 
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.search-results a {
+  display: block;
+  padding: 10px 15px;
+  text-decoration: none;
+  color: var(--dark);
+  border-bottom: 1px solid var(--border);
+}
+
+.search-results a:hover {
+  background: var(--light);
+}
+
 .mobile-menu-toggle {
   display: none;
   background: none;
@@ -155,25 +182,18 @@ body {
   top: 20px;
 }
 
-
 /* Hero Section */
 .hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 60px 0;
+  padding: 40px 0;
   margin-bottom: 40px;
   text-align: center;
 }
 
-.hero-content h1 {
-  font-size: 2.5rem;
-  margin-bottom: 15px;
-}
-
-.tagline {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  opacity: 0.9;
+.hero-content {
+  display: flex;
+  justify-content: center;
 }
 
 .hero-actions {
@@ -660,13 +680,8 @@ body {
   .post-image {
     flex: 0 0 auto;
   }
-  
-  .hero-content h1 {
-    font-size: 2rem;
-  }
 }
 
-/* Responsive Design for Header */
 @media (max-width: 768px) {
   .header-inner {
     padding: 15px 0;
@@ -681,9 +696,38 @@ body {
   }
   
   .main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    z-index: 1000;
     flex-direction: column;
     gap: 10px;
     margin-bottom: 20px;
+  }
+  
+  .main-nav.active {
+    display: flex;
+  }
+  
+  .dropdown {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .dropdown-content {
+    position: static;
+    box-shadow: none;
+    display: none;
+    width: 100%;
+  }
+  
+  .dropdown.active .dropdown-content {
+    display: block;
   }
   
   .search-container {
@@ -695,17 +739,18 @@ body {
     display: block;
   }
   
-  /* Mobile menu styles */
-  .main-nav.active {
-    display: flex;
+  .hero {
+    padding: 30px 0;
   }
-}
-
-
   
   .hero-actions {
     flex-direction: column;
     align-items: center;
+  }
+  
+  .hero-actions .btn {
+    width: 200px;
+    text-align: center;
   }
   
   .site-footer .container {
