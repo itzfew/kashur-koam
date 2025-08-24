@@ -822,37 +822,43 @@ body {
     box-shadow: var(--shadow);
   }
 
-  .main-nav {
-    position: fixed;
-    top: 0;
-    right: -10%;
-    width: 80%;
-    height: 100vh;
-    background: white;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    padding: 70px 20px 30px;
-    z-index: 1001;
-    transition: transform 0.3s ease-in-out;
-    overflow-y: auto;
-    display: block !important;
-    transform: translateX(100%);
-  }
+/* Base state - hidden off screen */
+.main-nav {
+  position: fixed;
+  top: 0;
+  left: -250px; /* pushes menu out of view */
+  width: 250px;
+  height: 100%;
+  background: #fff;
+  transition: left 0.3s ease;
+  z-index: 1000;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+}
 
-  .main-nav.active {
-    transform: translateX(-80%);
-    right: 0;
-  }
+/* Active state - slide into view */
+.main-nav.active {
+  left: 0;
+}
 
-  .main-nav a {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    margin: 8px 0;
-    border-radius: var(--radius);
-    transition: var(--transition);
-    color: var(--dark);
-    font-weight: 500;
-  }
+/* Overlay styling */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 900;
+}
+
+.menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
 
   .main-nav a:hover {
     background: var(--light);
