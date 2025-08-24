@@ -738,7 +738,7 @@ body {
 }
 
 .search-result-excerpt {
-  color: 555;
+  color: #555;
   margin-bottom: 15px;
 }
 
@@ -913,7 +913,7 @@ body {
     color: var(--primary);
   }
 
-  /* Overlay when menu is open */
+  /* Overlay when menu is open - FIXED to only dim page content */
   .menu-overlay {
     position: fixed;
     top: 0;
@@ -921,7 +921,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    z-index: 999; /* Lower than menu but higher than page content */
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
