@@ -1,0 +1,513 @@
+---
+layout: default
+title: Create Article
+permalink: /create-article/
+---
+
+<section class="create-article-page">
+  <div class="container">
+    <div class="create-article-header">
+      <h1>Submit a New Article</h1>
+      <p>Help us grow Kashurpedia by submitting your article. Fill out the form below and we'll review your submission.</p>
+    </div>
+
+    <div class="create-article-form">
+      <form id="article-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="article-title">Article Title *</label>
+            <input type="text" id="article-title" name="title" required>
+            <div class="form-help">Choose a descriptive title for your article</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="article-category">Category *</label>
+            <select id="article-category" name="category" required>
+              <option value="">Select a category</option>
+              <option value="Village">Village</option>
+              <option value="Mosques">Mosques</option>
+              <option value="Districts">Districts</option>
+              <option value="Schools">Schools</option>
+              <option value="Culture">Culture</option>
+              <option value="History">History</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="article-content">Article Content (Markdown format) *</label>
+            <textarea id="article-content" name="content" rows="15" required 
+                      placeholder="Write your article in Markdown format. Use headings, lists, and other formatting as needed.
+
+Example:
+# Introduction
+This is the introduction to your article.
+
+## Section Title
+- List item 1
+- List item 2
+- List item 3
+
+**Bold text** and *italic text*"></textarea>
+            <div class="form-help">
+              Use Markdown formatting for better presentation. 
+              <a href="https://www.markdownguide.org/cheat-sheet/" target="_blank" rel="noopener">Markdown Cheat Sheet</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="article-image">Featured Image URL (optional)</label>
+            <input type="url" id="article-image" name="image" placeholder="https://example.com/image.jpg">
+            <div class="form-help">Provide a direct link to your image (JPEG, PNG, or WebP recommended)</div>
+          </div>
+        </div>
+
+        <div class="form-row form-row-columns">
+          <div class="form-group">
+            <label for="your-name">Your Name (optional)</label>
+            <input type="text" id="your-name" name="name" placeholder="John Doe">
+          </div>
+
+          <div class="form-group">
+            <label for="your-email">Your Email (optional)</label>
+            <input type="email" id="your-email" name="email" placeholder="your@email.com">
+            <div class="form-help">We'll contact you about your submission</div>
+          </div>
+        </div>
+
+        <div class="form-submit">
+          <button type="submit" class="btn btn-primary btn-large">
+            <i class="fas fa-paper-plane"></i> Submit Article
+          </button>
+          <p class="form-note">By submitting, you agree to our content guidelines</p>
+        </div>
+      </form>
+
+      <div id="form-success" class="success-message" style="display: none;">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h3>Thank you for your submission!</h3>
+        <p>Your article has been prepared. Please check your email to complete the submission process.</p>
+        <div class="success-actions">
+          <button id="edit-form" class="btn btn-secondary">
+            <i class="fas fa-edit"></i> Edit Submission
+          </button>
+          <a href="/" class="btn btn-primary">
+            <i class="fas fa-home"></i> Return to Home
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="create-article-info">
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <h3>Writing Tips</h3>
+        <ul>
+          <li>Use clear, descriptive headings</li>
+          <li>Include relevant images when possible</li>
+          <li>Cite your sources for factual information</li>
+          <li>Keep paragraphs concise and focused</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <h3>Content Guidelines</h3>
+        <ul>
+          <li>Original content only (no plagiarism)</li>
+          <li>Respectful and factual information</li>
+          <li>Relevant to Kashmiri culture and heritage</li>
+          <li>Appropriate for all audiences</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const articleForm = document.getElementById('article-form');
+  const successMessage = document.getElementById('form-success');
+  const editButton = document.getElementById('edit-form');
+  
+  if (!articleForm) return;
+  
+  // Site email configuration
+  const siteEmail = 'itzme.eduhub.contact@gmail.com';
+  
+  articleForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Get form values
+    const title = document.getElementById('article-title').value.trim();
+    const category = document.getElementById('article-category').value;
+    const content = document.getElementById('article-content').value.trim();
+    const image = document.getElementById('article-image').value.trim();
+    const name = document.getElementById('your-name').value.trim();
+    const email = document.getElementById('your-email').value.trim();
+    
+    // Basic validation
+    if (!title || !category || !content) {
+      alert('Please fill in all required fields (Title, Category, and Content).');
+      return;
+    }
+    
+    // Generate markdown content with proper YAML front matter
+    const markdownContent = `---
+title: "${title.replace(/"/g, '\\"')}"
+date: ${new Date().toISOString().split('T')[0]}
+categories: [${category}]
+${image ? `image: "${image}"` : ''}
+author: ${name || 'Anonymous'}
+---
+
+${content}
+
+${name ? `\n*Submitted by: ${name}${email ? ` (${email})` : ''}*` : ''}
+`;
+    
+    // Prepare email content
+    const subject = `New Article Submission: ${title}`;
+    const body = `Please find below a new article submission for Kashurpedia:\n\n` +
+                 `--- ARTICLE SUBMISSION ---\n\n` +
+                 `${encodeURIComponent(markdownContent)}\n\n` +
+                 `--- END OF SUBMISSION ---\n\n` +
+                 `Please review this submission and add it to the website if appropriate.\n\n` +
+                 `Thank you!\n` +
+                 `Kashurpedia Submission System`;
+    
+    // Create mailto link
+    const mailtoLink = `mailto:${siteEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Show success message
+    articleForm.style.display = 'none';
+    successMessage.style.display = 'block';
+    
+    // Open email client after a short delay to allow success message to show
+    setTimeout(() => {
+      window.location.href = mailtoLink;
+    }, 1000);
+  });
+  
+  // Edit form button functionality
+  if (editButton) {
+    editButton.addEventListener('click', function() {
+      successMessage.style.display = 'none';
+      articleForm.style.display = 'block';
+    });
+  }
+  
+  // Add character counter for textarea
+  const contentTextarea = document.getElementById('article-content');
+  if (contentTextarea) {
+    const charCounter = document.createElement('div');
+    charCounter.className = 'char-counter';
+    charCounter.style.cssText = 'text-align: right; font-size: 0.8rem; color: var(--secondary); margin-top: 5px;';
+    contentTextarea.parentNode.appendChild(charCounter);
+    
+    function updateCharCounter() {
+      const length = contentTextarea.value.length;
+      charCounter.textContent = `${length} characters`;
+      
+      if (length > 5000) {
+        charCounter.style.color = 'var(--success)';
+      } else if (length > 1000) {
+        charCounter.style.color = 'var(--primary)';
+      } else {
+        charCounter.style.color = 'var(--secondary)';
+      }
+    }
+    
+    contentTextarea.addEventListener('input', updateCharCounter);
+    updateCharCounter();
+  }
+});
+</script>
+
+<style>
+.create-article-page {
+  padding: 40px 0;
+  background: var(--light);
+  min-height: 100vh;
+}
+
+.create-article-header {
+  text-align: center;
+  margin-bottom: 40px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.create-article-header h1 {
+  color: var(--dark);
+  margin-bottom: 15px;
+  font-size: 2.5rem;
+}
+
+.create-article-header p {
+  color: var(--secondary);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.create-article-form {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px;
+  margin-bottom: 40px;
+}
+
+.form-row {
+  margin-bottom: 25px;
+}
+
+.form-row-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--dark);
+  font-size: 1rem;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: var(--transition);
+  background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(11, 116, 222, 0.1);
+}
+
+.form-group textarea {
+  min-height: 300px;
+  resize: vertical;
+  line-height: 1.6;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, monospace;
+}
+
+.form-help {
+  font-size: 0.85rem;
+  color: var(--secondary);
+  margin-top: 5px;
+}
+
+.form-help a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.form-help a:hover {
+  text-decoration: underline;
+}
+
+.form-submit {
+  text-align: center;
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--border);
+}
+
+.btn-large {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+}
+
+.btn i {
+  margin-right: 8px;
+}
+
+.form-note {
+  margin-top: 15px;
+  color: var(--secondary);
+  font-size: 0.9rem;
+}
+
+.success-message {
+  text-align: center;
+  padding: 40px;
+  background: #f8fff9;
+  border: 2px solid #d4edda;
+  border-radius: var(--radius);
+}
+
+.success-icon {
+  font-size: 4rem;
+  color: var(--success);
+  margin-bottom: 20px;
+}
+
+.success-message h3 {
+  color: var(--success);
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.success-message p {
+  color: var(--secondary);
+  margin-bottom: 25px;
+  font-size: 1.1rem;
+}
+
+.success-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.create-article-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.info-card {
+  background: white;
+  padding: 30px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.info-icon {
+  font-size: 2.5rem;
+  color: var(--primary);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.info-card h3 {
+  color: var(--dark);
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.info-card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.info-card li {
+  padding: 8px 0;
+  color: var(--secondary);
+  position: relative;
+  padding-left: 25px;
+}
+
+.info-card li:before {
+  content: '•';
+  color: var(--primary);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+  font-size: 1.2rem;
+}
+
+.char-counter {
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--secondary);
+  margin-top: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .create-article-form {
+    padding: 25px 20px;
+    margin: 0 10px 30px 10px;
+  }
+  
+  .create-article-header {
+    padding: 0 20px;
+  }
+  
+  .create-article-header h1 {
+    font-size: 2rem;
+  }
+  
+  .form-row-columns {
+    grid-template-columns: 1fr;
+  }
+  
+  .create-article-info {
+    grid-template-columns: 1fr;
+    padding: 0 20px;
+  }
+  
+  .info-card {
+    padding: 20px;
+  }
+  
+  .success-actions {
+    flex-direction: column;
+  }
+  
+  .success-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-article-page {
+    padding: 20px 0;
+  }
+  
+  .create-article-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .create-article-form {
+    margin: 0 5px 20px 5px;
+    padding: 20px 15px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 12px;
+  }
+  
+  .btn-large {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+}
+</style>
