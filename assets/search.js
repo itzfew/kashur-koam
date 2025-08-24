@@ -1,4 +1,4 @@
-// Enhanced client-side search
+// Enhanced client-side search with redirect to search results page
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('search-input');
   if (!searchInput) return;
@@ -101,6 +101,14 @@ document.addEventListener('DOMContentLoaded', function() {
     searchResults.style.display = 'block';
   }
   
+  // Handle search form submission (redirect to search results page)
+  function handleSearchSubmit(query) {
+    if (query.length > 0) {
+      // Redirect to search results page with query parameter
+      window.location.href = `/search/?q=${encodeURIComponent(query)}`;
+    }
+  }
+  
   // Debounce search to improve performance
   let searchTimeout;
   function debouncedSearch(query) {
@@ -126,6 +134,9 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Escape') {
       searchResults.style.display = 'none';
       searchInput.blur();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearchSubmit(searchInput.value.trim());
     }
   });
   
@@ -163,112 +174,194 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (e.key === 'Escape') {
       searchResults.style.display = 'none';
       searchInput.focus();
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      e.target.click();
     }
   });
   
-  // Mobile menu functionality
+  // Mobile side menu functionality
   const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
   const mainNav = document.querySelector('.main-nav');
+  const body = document.body;
   
+  // Create overlay element
+  const overlay = document.createElement('div');
+  overlay.className = 'menu-overlay';
+  document.body.appendChild(overlay);
+
   if (mobileMenuToggle && mainNav) {
-    mobileMenuToggle.addEventListener('click', function(e) {
-      e.stopPropagation();
+    // Toggle menu function
+    function toggleMenu() {
       mainNav.classList.toggle('active');
+      overlay.classList.toggle('active');
+      body.classList.toggle('menu-open');
       
       // Change icon based on menu state
-      const icon = this.querySelector('i');
+      const icon = mobileMenuToggle.querySelector('i');
       if (mainNav.classList.contains('active')) {
         icon.classList.remove('fa-bars');
         icon.classList.add('fa-times');
-        document.addEventListener('click', closeMobileMenu);
+        mobileMenuToggle.classList.add('active');
       } else {
         icon.classList.remove('fa-times');
         icon.classList.add('fa-bars');
-        document.removeEventListener('click', closeMobileMenu);
-      }
-    });
-    
-    // Prevent clicks inside nav from closing it
-    mainNav.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-    
-    // Close mobile menu when clicking outside
-    function closeMobileMenu(e) {
-      if (!mainNav.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
-        mainNav.classList.remove('active');
-        const icon = mobileMenuToggle.querySelector('i');
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars');
-        document.removeEventListener('click', closeMobileMenu);
+        mobileMenuToggle.classList.remove('active');
       }
     }
-    
+
+    mobileMenuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Close menu when clicking overlay
+    overlay.addEventListener('click', function() {
+      toggleMenu();
+    });
+
+    // Close menu when clicking escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mainNav.classList.contains('active')) {
+        toggleMenu();
+      }
+    });
+
     // Handle dropdowns in mobile view
     const dropdownToggles = mainNav.querySelectorAll('.dropdown-toggle');
     dropdownToggles.forEach(toggle => {
       toggle.addEventListener('click', function(e) {
         if (window.innerWidth <= 768) {
           e.preventDefault();
-          const dropdown = this.parentElement;
-          dropdown.classList.toggle('active');
+          e.stopPropagation();
           
-          // Close other dropdowns
+          const dropdown = this.parentElement;
+          const wasActive = dropdown.classList.contains('active');
+          
+          // Close all other dropdowns
           dropdownToggles.forEach(otherToggle => {
             if (otherToggle !== toggle) {
               otherToggle.parentElement.classList.remove('active');
             }
           });
+          
+          // Toggle current dropdown
+          if (!wasActive) {
+            dropdown.classList.add('active');
+          } else {
+            dropdown.classList.remove('active');
+          }
         }
       });
     });
-  }
-  
-  // Close dropdowns when clicking outside (desktop)
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.dropdown') && window.innerWidth > 768) {
-      document.querySelectorAll('.dropdown-content').forEach(function(dropdown) {
-        dropdown.style.display = 'none';
-      });
-    }
-    
-    // Handle dropdown hover for desktop
-    if (window.innerWidth > 768) {
-      const dropdowns = document.querySelectorAll('.dropdown');
-      dropdowns.forEach(dropdown => {
-        dropdown.addEventListener('mouseenter', function() {
-          this.querySelector('.dropdown-content').style.display = 'block';
-        });
-        
-        dropdown.addEventListener('mouseleave', function() {
-          this.querySelector('.dropdown-content').style.display = 'none';
-        });
-      });
-    }
-  });
-  
-  // Handle window resize
-  window.addEventListener('resize', function() {
-    // Close mobile menu when resizing to desktop
-    if (window.innerWidth > 768 && mainNav) {
-      mainNav.classList.remove('active');
-      if (mobileMenuToggle) {
-        const icon = mobileMenuToggle.querySelector('i');
-        icon.classList.remove('fa-times');
-        icon.classList.add('fa-bars');
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768 && mainNav.classList.contains('active')) {
+        if (!e.target.closest('.dropdown') && !e.target.closest('.dropdown-toggle')) {
+          dropdownToggles.forEach(toggle => {
+            toggle.parentElement.classList.remove('active');
+          });
+        }
       }
-    }
-    
-    // Reset dropdowns on resize
-    document.querySelectorAll('.dropdown').forEach(dropdown => {
-      dropdown.classList.remove('active');
     });
-    
-    // Ensure dropdown content is visible on desktop
-    if (window.innerWidth > 768) {
-      document.querySelectorAll('.dropdown-content').forEach(dropdown => {
-        dropdown.style.display = 'none';
-      });
-    }
+  }
+
+  // Handle window resize
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      // Close menu when resizing to desktop
+      if (window.innerWidth > 768) {
+        if (mainNav && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          overlay.classList.remove('active');
+          body.classList.remove('menu-open');
+          
+          if (mobileMenuToggle) {
+            const icon = mobileMenuToggle.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+            mobileMenuToggle.classList.remove('active');
+          }
+        }
+        
+        // Reset all dropdowns
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+          dropdown.classList.remove('active');
+        });
+      }
+    }, 250);
   });
 });
+
+// Search results page functionality
+if (window.location.pathname === '/search/') {
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('q');
+    
+    if (query) {
+      const searchResultsContainer = document.getElementById('search-results-list');
+      const searchQueryElement = document.getElementById('search-query');
+      
+      if (searchQueryElement) {
+        searchQueryElement.textContent = query;
+      }
+      
+      // Load search index and display results
+      fetch('/search.json')
+        .then(response => response.json())
+        .then(searchIndex => {
+          const results = searchIndex.filter(item => {
+            const regex = new RegExp(query, 'i');
+            return (
+              (item.title && regex.test(item.title)) ||
+              (item.content && regex.test(item.content)) ||
+              (item.categories && item.categories.some(cat => regex.test(cat))) ||
+              (item.tags && item.tags.some(tag => regex.test(tag)))
+            );
+          });
+          
+          if (searchResultsContainer) {
+            if (results.length > 0) {
+              searchResultsContainer.innerHTML = results.map(result => `
+                <div class="search-result-item">
+                  <h2><a href="${result.url}">${result.title}</a></h2>
+                  <div class="search-result-meta">
+                    ${result.date ? new Date(result.date).toLocaleDateString() : ''}
+                    ${result.categories ? ` • ${result.categories.join(', ')}` : ''}
+                  </div>
+                  <div class="search-result-excerpt">
+                    ${result.excerpt || ''}
+                  </div>
+                  <a href="${result.url}" class="read-more">Read More</a>
+                </div>
+              `).join('');
+            } else {
+              searchResultsContainer.innerHTML = `
+                <div class="no-results">
+                  <h2>No results found for "${query}"</h2>
+                  <p>Try different keywords or browse our categories</p>
+                  <a href="/" class="btn btn-primary">Return to Homepage</a>
+                </div>
+              `;
+            }
+          }
+        })
+        .catch(error => {
+          console.error('Error loading search results:', error);
+          if (searchResultsContainer) {
+            searchResultsContainer.innerHTML = `
+              <div class="no-results">
+                <h2>Error loading search results</h2>
+                <p>Please try again later</p>
+              </div>
+            `;
+          }
+        });
+    }
+  });
+}
