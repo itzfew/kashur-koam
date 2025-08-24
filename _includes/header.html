@@ -1,14 +1,32 @@
 <header class="site-header">
   <div class="container header-inner">
     <div class="branding">
-      <a href="{{ '/' | relative_url }}"><h1>{{ site.title }}</h1></a>
+      <a href="{{ '/' | relative_url }}">
+        <h1>{{ site.title }}</h1>
+      </a>
       <p class="site-tagline">{{ site.description }}</p>
     </div>
     <nav class="main-nav">
-      <a href="{{ '/' | relative_url }}">Home</a>
-      <a href="/about/">About</a>
-      <a href="/privacy-policy/">Privacy</a>
-      <input id="search-input" placeholder="Search articles..." aria-label="Search articles">
+      <a href="{{ '/' | relative_url }}"><i class="fas fa-home"></i> Home</a>
+      <div class="dropdown">
+        <a href="#" class="dropdown-toggle"><i class="fas fa-tags"></i> Categories <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-content">
+          <a href="/categories/village/">Village</a>
+          <a href="/categories/mosques/">Mosques</a>
+          <a href="/categories/districts/">Districts</a>
+          <a href="/categories/schools/">Schools</a>
+        </div>
+      </div>
+      <a href="/about/"><i class="fas fa-info-circle"></i> About</a>
+      <a href="/contact/"><i class="fas fa-envelope"></i> Contact</a>
+      <a href="/create-article/"><i class="fas fa-plus-circle"></i> Create Article</a>
+      <div class="search-container">
+        <input id="search-input" placeholder="Search articles..." aria-label="Search articles">
+        <div id="search-results" class="search-results"></div>
+      </div>
     </nav>
+    <button class="mobile-menu-toggle" aria-label="Toggle menu">
+      <i class="fas fa-bars"></i>
+    </button>
   </div>
 </header>
