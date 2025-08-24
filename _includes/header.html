@@ -6,6 +6,7 @@
       </a>
       <p class="site-tagline">{{ site.description }}</p>
     </div>
+    
     <nav class="main-nav">
       <a href="{{ '/' | relative_url }}"><i class="fas fa-home"></i> Home</a>
       <div class="dropdown">
@@ -20,11 +21,13 @@
       <a href="/about/"><i class="fas fa-info-circle"></i> About</a>
       <a href="/contact/"><i class="fas fa-envelope"></i> Contact</a>
       <a href="/create-article/"><i class="fas fa-plus-circle"></i> Create Article</a>
-      <div class="search-container">
-        <input id="search-input" placeholder="Search articles..." aria-label="Search articles">
-        <div id="search-results" class="search-results"></div>
-      </div>
     </nav>
+    
+    <div class="search-container">
+      <input id="search-input" placeholder="Search articles..." aria-label="Search articles">
+      <div id="search-results" class="search-results"></div>
+    </div>
+    
     <button class="mobile-menu-toggle" aria-label="Toggle menu">
       <i class="fas fa-bars"></i>
     </button>
