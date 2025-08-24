@@ -2,7 +2,7 @@
 layout: post
 title: "Dreri Kali Pora - The Hidden Gem of Shopian"
 date: 2023-11-20 10:00:00 +0530
-categories: [Village, Districts]
+categories: [village, districts]
 tags: [dreri kali pora, shopian, kashmir, tourism, apple orchards, rural kashmir]
 image: /assets/images/dreri-kali-pora.jpg
 description: "Discover Dreri Kali Pora, a picturesque village in Shopian district of Jammu and Kashmir, famous for its apple orchards, scenic views, and authentic Kashmiri rural charm."
