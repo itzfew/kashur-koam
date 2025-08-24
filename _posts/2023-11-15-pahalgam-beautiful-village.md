@@ -2,7 +2,7 @@
 layout: post
 title: "Pahalgam - The Beautiful Village of Kashmir"
 date: 2023-11-15 10:00:00 +0530
-categories: [Village, Districts]
+categories: [village, districts]
 tags: [pahalgam, kashmir, tourism, lidder river, betaab valley]
 image: /assets/images/pahalgam-village.jpg
 description: "Explore the stunning beauty of Pahalgam village, nestled in the heart of Kashmir valley, known for its pristine landscapes, Lidder River, and rich cultural heritage."
