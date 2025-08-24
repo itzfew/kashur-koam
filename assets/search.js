@@ -32,24 +32,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     const results = searchIndex.filter(item => {
+      // Escape special regex characters in query
       const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(escapedQuery, 'i');
       
       const titleMatch = item.title && regex.test(item.title);
       const contentMatch = item.content && regex.test(item.content);
-      const categoryMatch = item.categories && item.categories.some(cat => regex.test(cat));
-      const tagsMatch = item.tags && item.tags.some(tag => regex.test(tag));
+      const categoryMatch = item.categories && item.categories.some(cat => 
+        regex.test(cat)
+      );
+      const tagsMatch = item.tags && item.tags.some(tag => 
+        regex.test(tag)
+      );
       
       return titleMatch || contentMatch || categoryMatch || tagsMatch;
     });
     
-    // Sort by relevance
+    // Sort by relevance (title matches first, then category, then content)
     results.sort((a, b) => {
       const aTitleMatch = a.title && new RegExp(query, 'i').test(a.title);
       const bTitleMatch = b.title && new RegExp(query, 'i').test(b.title);
       
-      const aCategoryMatch = a.categories && a.categories.some(cat => new RegExp(query, 'i').test(cat));
-      const bCategoryMatch = b.categories && b.categories.some(cat => new RegExp(query, 'i').test(cat));
+      const aCategoryMatch = a.categories && a.categories.some(cat => 
+        new RegExp(query, 'i').test(cat)
+      );
+      const bCategoryMatch = b.categories && b.categories.some(cat => 
+        new RegExp(query, 'i').test(cat)
+      );
       
       if (aTitleMatch && !bTitleMatch) return -1;
       if (!aTitleMatch && bTitleMatch) return 1;
@@ -71,10 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     searchResults.innerHTML = results.map(result => {
+      // Highlight matching text in title
       let highlightedTitle = result.title;
       if (searchInput.value.length >= 2) {
         const regex = new RegExp(searchInput.value, 'gi');
-        highlightedTitle = result.title.replace(regex, match => `<span class="search-highlight">${match}</span>`);
+        highlightedTitle = result.title.replace(regex, match => 
+          `<span class="search-highlight">${match}</span>`
+        );
       }
       
       return `
@@ -92,11 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle search form submission (redirect to search results page)
   function handleSearchSubmit(query) {
     if (query.length > 0) {
+      // Redirect to search results page with query parameter
       window.location.href = `/search/?q=${encodeURIComponent(query)}`;
     }
   }
   
-  // Debounce search
+  // Debounce search to improve performance
   let searchTimeout;
   function debouncedSearch(query) {
     clearTimeout(searchTimeout);
@@ -105,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300);
   }
   
-  // Event listeners for search
+  // Event listeners
   searchInput.addEventListener('input', function(e) {
     const query = e.target.value.toLowerCase().trim();
     debouncedSearch(query);
@@ -127,12 +140,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // Hide results when clicking outside
   document.addEventListener('click', function(e) {
     if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
       searchResults.style.display = 'none';
     }
   });
   
+  // Keyboard navigation
   searchInput.addEventListener('keydown', function(e) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -164,6 +179,122 @@ document.addEventListener('DOMContentLoaded', function() {
       e.target.click();
     }
   });
+  
+  // Mobile side menu functionality
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const mainNav = document.querySelector('.main-nav');
+  const body = document.body;
+  
+  // Create overlay element
+  const overlay = document.createElement('div');
+  overlay.className = 'menu-overlay';
+  document.body.appendChild(overlay);
+
+  if (mobileMenuToggle && mainNav) {
+    // Toggle menu function
+    function toggleMenu() {
+      mainNav.classList.toggle('active');
+      overlay.classList.toggle('active');
+      body.classList.toggle('menu-open');
+      
+      // Change icon based on menu state
+      const icon = mobileMenuToggle.querySelector('i');
+      if (mainNav.classList.contains('active')) {
+        icon.classList.remove('fa-bars');
+        icon.classList.add('fa-times');
+        mobileMenuToggle.classList.add('active');
+      } else {
+        icon.classList.remove('fa-times');
+        icon.classList.add('fa-bars');
+        mobileMenuToggle.classList.remove('active');
+      }
+    }
+
+    mobileMenuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    // Close menu when clicking overlay
+    overlay.addEventListener('click', function() {
+      toggleMenu();
+    });
+
+    // Close menu when clicking escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && mainNav.classList.contains('active')) {
+        toggleMenu();
+      }
+    });
+
+    // Handle dropdowns in mobile view
+    const dropdownToggles = mainNav.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const dropdown = this.parentElement;
+          const wasActive = dropdown.classList.contains('active');
+          
+          // Close all other dropdowns
+          dropdownToggles.forEach(otherToggle => {
+            if (otherToggle !== toggle) {
+              otherToggle.parentElement.classList.remove('active');
+            }
+          });
+          
+          // Toggle current dropdown
+          if (!wasActive) {
+            dropdown.classList.add('active');
+          } else {
+            dropdown.classList.remove('active');
+          }
+        }
+      });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (window.innerWidth <= 768 && mainNav.classList.contains('active')) {
+        if (!e.target.closest('.dropdown') && !e.target.closest('.dropdown-toggle')) {
+          dropdownToggles.forEach(toggle => {
+            toggle.parentElement.classList.remove('active');
+          });
+        }
+      }
+    });
+  }
+
+  // Handle window resize
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      // Close menu when resizing to desktop
+      if (window.innerWidth > 768) {
+        if (mainNav && mainNav.classList.contains('active')) {
+          mainNav.classList.remove('active');
+          overlay.classList.remove('active');
+          body.classList.remove('menu-open');
+          
+          if (mobileMenuToggle) {
+            const icon = mobileMenuToggle.querySelector('i');
+            icon.classList.remove('fa-times');
+            icon.classList.add('fa-bars');
+            mobileMenuToggle.classList.remove('active');
+          }
+        }
+        
+        // Reset all dropdowns
+        const dropdowns = document.querySelectorAll('.dropdown');
+        dropdowns.forEach(dropdown => {
+          dropdown.classList.remove('active');
+        });
+      }
+    }, 250);
+  });
 });
 
 // Search results page functionality
@@ -180,6 +311,7 @@ if (window.location.pathname === '/search/') {
         searchQueryElement.textContent = query;
       }
       
+      // Load search index and display results
       fetch('/search.json')
         .then(response => response.json())
         .then(searchIndex => {
@@ -202,7 +334,9 @@ if (window.location.pathname === '/search/') {
                     ${result.date ? new Date(result.date).toLocaleDateString() : ''}
                     ${result.categories ? ` • ${result.categories.join(', ')}` : ''}
                   </div>
-                  <div class="search-result-excerpt">${result.excerpt || ''}</div>
+                  <div class="search-result-excerpt">
+                    ${result.excerpt || ''}
+                  </div>
                   <a href="${result.url}" class="read-more">Read More</a>
                 </div>
               `).join('');
@@ -231,49 +365,3 @@ if (window.location.pathname === '/search/') {
     }
   });
 }
-
-// Simplified mobile menu toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-  const menuToggle = document.querySelector('.mobile-menu-toggle');
-  const mainNav = document.querySelector('.main-nav');
-  const menuOverlay = document.querySelector('.menu-overlay');
-  const body = document.body;
-
-  if (!menuToggle || !mainNav || !menuOverlay) return;
-
-  menuToggle.addEventListener('click', function() {
-    mainNav.classList.toggle('active');
-    menuOverlay.classList.toggle('active');
-    body.classList.toggle('menu-open');
-    
-    const icon = menuToggle.querySelector('i');
-    if (mainNav.classList.contains('active')) {
-      icon.classList.remove('fa-bars');
-      icon.classList.add('fa-times');
-    } else {
-      icon.classList.remove('fa-times');
-      icon.classList.add('fa-bars');
-    }
-  });
-
-  // Close menu when clicking overlay
-  menuOverlay.addEventListener('click', function() {
-    mainNav.classList.remove('active');
-    menuOverlay.classList.remove('active');
-    body.classList.remove('menu-open');
-    
-    const icon = menuToggle.querySelector('i');
-    icon.classList.remove('fa-times');
-    icon.classList.add('fa-bars');
-  });
-
-  // Prevent menu from closing when clicking on menu items
-  const menuItems = document.querySelectorAll('.main-nav a');
-  menuItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      if (!this.parentElement.classList.contains('dropdown-toggle')) {
-        e.stopPropagation();
-      }
-    });
-  });
-});
