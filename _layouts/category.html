@@ -2,28 +2,38 @@
 layout: default
 ---
 
+<section class="category-header">
+  <h1>Category: {{ page.title }}</h1>
+  <p>{{ page.description | default: "Articles in this category" }}</p>
+</section>
+
 <section class="posts-list">
-  {% assign cat = page.title | downcase %}
-  {% for post in site.categories[cat] %}
-  <article class="post-preview">
-    {% if post.image %}
-    <div class="post-image">
-      <img src="{{ post.image }}" alt="{{ post.title }}">
-    </div>
-    {% endif %}
-    <div class="post-content">
-      <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
-      <p class="meta">
-        <i class="far fa-calendar"></i> {{ post.date | date: "%B %d, %Y" }}
-        {% if post.categories %} • <i class="fas fa-tag"></i>
-        {% for category in post.categories %}
-          <a href="/categories/{{ category | slugify }}/">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
-        {% endfor %}
+  {% assign cat = page.slug | default: page.title | downcase %}
+  
+  {% if site.categories[cat] and site.categories[cat].size > 0 %}
+    {% for post in site.categories[cat] %}
+      <article class="post-preview">
+        {% if post.image %}
+        <div class="post-image">
+          <img src="{{ post.image }}" alt="{{ post.title }}">
+        </div>
         {% endif %}
-      </p>
-      <div class="excerpt">{{ post.excerpt | strip_html | truncate: 250 }}</div>
-      <a class="read-more" href="{{ post.url | relative_url }}">Read More <i class="fas fa-arrow-right"></i></a>
-    </div>
-  </article>
-  {% endfor %}
+        <div class="post-content">
+          <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
+          <p class="meta">
+            <i class="far fa-calendar"></i> {{ post.date | date: "%B %d, %Y" }}
+            {% if post.categories %} • <i class="fas fa-tag"></i>
+              {% for category in post.categories %}
+                <a href="/categories/{{ category | slugify }}/">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
+              {% endfor %}
+            {% endif %}
+          </p>
+          <div class="excerpt">{{ post.excerpt | strip_html | truncate: 250 }}</div>
+          <a class="read-more" href="{{ post.url | relative_url }}">Read More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </article>
+    {% endfor %}
+  {% else %}
+    <p>No posts found in this category.</p>
+  {% endif %}
 </section>
