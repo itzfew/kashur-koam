@@ -825,7 +825,7 @@ body {
   .main-nav {
     position: fixed;
     top: 0;
-    right: -80%;
+    right: -10%;
     width: 80%;
     height: 100vh;
     background: white;
@@ -1096,7 +1096,7 @@ body.menu-open {
   }
 
   .main-nav {
-    right: -85%;
+    right: -10%;
     width: 85%;
   }
 
