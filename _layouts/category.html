@@ -1,12 +1,10 @@
 ---
 layout: default
 ---
-
 <section class="category-header">
   <h1>category: {{ page.title | default: "unknown" }}</h1>
   <p>{{ page.description | default: "explore articles in the " | append: page.title | append: " category." }}</p>
 </section>
-
 <section class="posts-list">
   {% assign posts = site.categories[page.title | slugify | downcase] %}
   {% if posts.size > 0 %}
