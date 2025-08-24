@@ -2,41 +2,58 @@
 layout: default
 ---
 
-<h1>{{ page.category | capitalize }} Posts</h1>
+<section class="category-header">
+  <h1>Category: {{ page.title }}</h1>
+  <p>{{ page.description | default: "Explore articles in the " | append: page.title | append: " category." }}</p>
+</section>
 
-<div class="posts">
-  {% for post in site.posts %}
-    {% if post.categories contains page.category %}
-      <article class="post">
+<section class="posts-list">
+  {% assign posts = site.categories[page.title | slugify] %}
+  {% if posts.size > 0 %}
+    {% for post in posts %}
+      <article class="post-preview" aria-labelledby="post-{{ forloop.index }}-title">
         {% if post.image %}
-          <img src="{{ post.image | relative_url }}" alt="{{ post.title }}" style="max-width: 100%; height: auto;">
+          <div class="post-image">
+            <img src="{{ post.image | relative_url }}" alt="Featured image for {{ post.title | escape }}" loading="lazy">
+          </div>
+        {% else %}
+          <div class="post-image">
+            <img src="/assets/images/default-placeholder.jpg" alt="Placeholder image for {{ post.title | escape }}" loading="lazy">
+          </div>
         {% endif %}
-        <h2><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h2>
-        <p>{{ post.description }}</p>
-        <p><small>By {{ post.author }} | {{ post.date | date: "%B %d, %Y" }}</small></p>
-        <a href="{{ post.url | relative_url }}" class="read-more">Read More</a>
+        <div class="post-content">
+          <h2 id="post-{{ forloop.index }}-title"><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h2>
+          <p class="meta">
+            <i class="far fa-calendar" aria-hidden="true"></i> {{ post.date | date: "%B %d, %Y" }} 
+            {% if post.categories %}
+              • <i class="fas fa-tag" aria-hidden="true"></i> 
+              {% for category in post.categories %}
+                <a href="/categories/{{ category | slugify }}/" aria-label="View all posts in {{ category }}">{{ category }}</a>{% unless forloop.last %}, {% endunless %}
+              {% endfor %}
+            {% endif %}
+          </p>
+          <div class="excerpt">{{ post.excerpt | strip_html | truncatewords: 40 }}</div>
+          <a class="read-more" href="{{ post.url | relative_url }}">Read More <i class="fas fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
       </article>
-    {% endif %}
-  {% endfor %}
-</div>
+    {% endfor %}
+  {% else %}
+    <p>No posts found in the "{{ page.title }}" category. Check back later for new articles!</p>
+  {% endif %}
+</section>
 
-<style>
-  .posts {
-    display: grid;
-    gap: 20px;
-  }
-  .post {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-  }
-  .read-more {
-    display: inline-block;
-    margin-top: 10px;
-    color: #007bff;
-    text-decoration: none;
-  }
-  .read-more:hover {
-    text-decoration: underline;
-  }
-</style>
+{% if paginator.total_pages > 1 %}
+  <nav class="pagination" aria-label="Pagination">
+    {% if paginator.previous_page %}
+      <a href="{{ paginator.previous_page_path | relative_url }}" class="pagination-prev">Previous</a>
+    {% else %}
+      <span class="pagination-prev disabled">Previous</span>
+    {% endif %}
+    <span class="pagination-info">Page {{ paginator.page }} of {{ paginator.total_pages }}</span>
+    {% if paginator.next_page %}
+      <a href="{{ paginator.next_page_path | relative_url }}" class="pagination-next">Next</a>
+    {% else %}
+      <span class="pagination-next disabled">Next</span>
+    {% endif %}
+  </nav>
+{% endif %}
